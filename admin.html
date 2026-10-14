@@ -31,12 +31,16 @@
 <div class="dash" id="dashView" hidden>
   <header class="top">
     <div class="brand"><span class="mark">b</span><div>bai Hotel<small>Admin dashboard</small></div></div>
-    <div class="top-actions">
-      <span class="who" id="who"></span>
-      <button class="btn" id="newBtn" type="button">+ New appointment</button>
-      <a class="btn ghost" href="index.html">Website</a>
-      <button class="btn ghost" id="pwBtn" type="button">Password</button>
-      <button class="btn ghost" id="logoutBtn" type="button">Sign out</button>
+    <div class="menu-wrap">
+      <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
+      <div class="menu" id="menu" hidden>
+        <div class="who" id="who"></div>
+        <button class="mi" id="newBtn" type="button"><b>+</b> New appointment</button>
+        <button class="mi" id="printBtn2" type="button"><b>⎙</b> Print list</button>
+        <a class="mi" href="index.html"><b>↗</b> Website</a>
+        <button class="mi" id="pwBtn" type="button"><b>🔑</b> Change password</button>
+        <button class="mi out" id="logoutBtn" type="button"><b>⏻</b> Sign out</button>
+      </div>
     </div>
   </header>
 

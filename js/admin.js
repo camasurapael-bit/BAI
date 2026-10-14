@@ -251,6 +251,14 @@ $('csvBtn').onclick = () => {
   setTimeout(()=>URL.revokeObjectURL(url), 1000);
 };
 $('printBtn').onclick = () => window.print();
+$('printBtn2').onclick = () => { setMenu(false); window.print(); };
+
+/* hamburger menu */
+function setMenu(open){ $('menu').hidden = !open; $('burger').setAttribute('aria-expanded', open); $('burger').setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); }
+$('burger').addEventListener('click', e => { e.stopPropagation(); setMenu($('menu').hidden); });
+$('menu').addEventListener('click', e => { if (e.target.closest('.mi')) setMenu(false); });
+document.addEventListener('click', e => { if (!e.target.closest('.menu-wrap')) setMenu(false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
 
 /* =====================================================
    CHARTS (inline SVG, no library). One hue (blue) for magnitude;
