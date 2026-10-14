@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin — bai Hotel Cebu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- LOGIN -->
+<main class="login" id="loginView">
+  <form class="card" id="loginForm" novalidate>
+    <a href="index.html" class="back">← Back to website</a>
+    <div class="brand"><span class="mark">b</span><div>bai Hotel<small>Admin</small></div></div>
+    <h1>Admin sign in</h1>
+    <label for="aEmail">Email</label>
+    <input type="email" id="aEmail" autocomplete="username" placeholder="admin@gmail.com" required>
+    <label for="aPass">Password</label>
+    <input type="password" id="aPass" autocomplete="current-password" required>
+    <p class="msg" id="loginMsg" role="alert"></p>
+    <button class="btn" id="loginBtn" type="submit">Sign in</button>
+  </form>
+</main>
+
+<!-- DASHBOARD -->
+<div class="dash" id="dashView" hidden>
+  <header class="top">
+    <div class="brand"><span class="mark">b</span><div>bai Hotel<small>Admin dashboard</small></div></div>
+    <div class="top-actions">
+      <span class="who" id="who"></span>
+      <button class="btn" id="newBtn" type="button">+ New appointment</button>
+      <a class="btn ghost" href="index.html">Website</a>
+      <button class="btn ghost" id="pwBtn" type="button">Password</button>
+      <button class="btn ghost" id="logoutBtn" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <section class="wrap">
+    <p class="live" id="live"><span class="dot"></span><span id="liveTxt">Connecting…</span></p>
+    <p class="msg" id="dashMsg" role="alert"></p>
+
+    <h2 class="sec">Overview</h2>
+    <div class="stats">
+      <div class="stat"><b id="stTotal">0</b><span>Total bookings</span></div>
+      <div class="stat"><b id="stPending">0</b><span>Pending</span></div>
+      <div class="stat"><b id="stUpcoming">0</b><span>Upcoming</span></div>
+      <div class="stat"><b id="stToday">0</b><span>Today</span></div>
+      <div class="stat"><b id="stGuests">0</b><span>Guests expected</span></div>
+    </div>
+
+    <div class="charts">
+      <figure class="chart wide" id="c1">
+        <figcaption>
+          <div><h3>Appointments per day</h3><p>Count by appointment date, cancelled excluded</p></div>
+          <div class="seg" id="rangeSeg" role="group" aria-label="Date range">
+            <button type="button" data-r="past" class="on">Past 30 days</button>
+            <button type="button" data-r="next">Next 30 days</button>
+          </div>
+        </figcaption>
+        <div class="plot" id="p1" role="img" aria-label="Column chart of appointments per day"></div>
+      </figure>
+      <figure class="chart" id="c2">
+        <figcaption><div><h3>Bookings by service</h3><p>All time, cancelled excluded</p></div></figcaption>
+        <div class="plot" id="p2" role="img" aria-label="Bar chart of bookings by service"></div>
+      </figure>
+      <figure class="chart" id="c3">
+        <figcaption><div><h3>Status</h3><p>All bookings</p></div></figcaption>
+        <div class="plot" id="p3" role="img" aria-label="Breakdown of bookings by status"></div>
+      </figure>
+      <figure class="chart wide" id="c4">
+        <figcaption><div><h3>Busiest times</h3><p>Count by appointment start hour, cancelled excluded</p></div></figcaption>
+        <div class="plot" id="p4" role="img" aria-label="Column chart of bookings by hour of day"></div>
+      </figure>
+    </div>
+
+    <h2 class="sec">Appointments</h2>
+    <div class="filters">
+      <input type="search" id="q" placeholder="Search name, phone, email, ref code…" aria-label="Search">
+      <select id="fService" aria-label="Service"><option value="">All services</option></select>
+      <select id="fStatus" aria-label="Status">
+        <option value="">All statuses</option>
+        <option value="pending">Pending</option><option value="confirmed">Confirmed</option>
+        <option value="completed">Completed</option><option value="cancelled">Cancelled</option>
+      </select>
+      <select id="fWhen" aria-label="Date">
+        <option value="">All dates</option><option value="upcoming">Upcoming</option>
+        <option value="today">Today</option><option value="past">Past</option>
+      </select>
+      <select id="fSort" aria-label="Sort">
+        <option value="apptAsc">Appointment: soonest first</option>
+        <option value="apptDesc">Appointment: latest first</option>
+        <option value="newest">Newest booked first</option>
+      </select>
+      <button class="btn ghost" id="csvBtn" type="button">Export CSV</button>
+      <button class="btn ghost" id="printBtn" type="button">Print</button>
+    </div>
+    <p class="count" id="count"></p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Ref</th><th>Appointment</th><th>Service</th><th>Guests</th><th>Guest name</th><th>Contact</th><th>Status</th><th></th></tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <p class="empty" id="empty" hidden>No appointments found.</p>
+    </div>
+  </section>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="detailModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dTitle">
+    <button class="x" type="button" data-close aria-label="Close">×</button>
+    <h2 id="dTitle">Appointment</h2>
+    <dl class="kv" id="dBody"></dl>
+    <label for="dStatus">Status</label>
+    <select id="dStatus">
+      <option value="pending">Pending</option><option value="confirmed">Confirmed</option>
+      <option value="completed">Completed</option><option value="cancelled">Cancelled</option>
+    </select>
+    <label for="dNote">Internal note (guests never see this)</label>
+    <textarea id="dNote" rows="3" maxlength="500" placeholder="e.g. Called guest, confirmed by phone."></textarea>
+    <p class="msg" id="dMsg" role="alert"></p>
+    <div class="modal-actions">
+      <button class="btn danger" id="dDelete" type="button">Delete</button>
+      <span class="grow"></span>
+      <button class="btn ghost" type="button" data-close>Close</button>
+      <button class="btn" id="dSave" type="button">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW APPOINTMENT MODAL -->
+<div class="overlay" id="newModal" hidden>
+  <form class="modal" id="newForm" novalidate role="dialog" aria-modal="true" aria-labelledby="nTitle">
+    <button class="x" type="button" data-close aria-label="Close">×</button>
+    <h2 id="nTitle">New appointment</h2>
+    <p class="hint">For phone or walk-in bookings. It is saved as Confirmed.</p>
+    <div class="grid2">
+      <div><label for="nService">Service</label>
+        <select id="nService" required>
+          <option value="">Select…</option>
+          <option>Room Reservation</option><option>Dining Reservation</option><option>Spa Appointment</option>
+          <option>Pool Day Pass</option><option>Event / Function</option><option>Airport Transfer</option>
+        </select></div>
+      <div><label for="nGuests">Guests</label><input type="number" id="nGuests" min="1" max="50" value="2" required></div>
+      <div><label for="nDate">Date</label><input type="date" id="nDate" required></div>
+      <div><label for="nTime">Time</label><input type="time" id="nTime" min="07:00" max="20:00" step="1800" required></div>
+      <div><label for="nName">Guest name</label><input type="text" id="nName" required></div>
+      <div><label for="nPhone">Mobile</label><input type="tel" id="nPhone" required></div>
+    </div>
+    <label for="nEmail">Email (optional)</label><input type="email" id="nEmail">
+    <label for="nNotes">Notes (optional)</label><input type="text" id="nNotes" maxlength="500">
+    <p class="msg" id="nMsg" role="alert"></p>
+    <div class="modal-actions"><span class="grow"></span>
+      <button class="btn ghost" type="button" data-close>Cancel</button>
+      <button class="btn" id="nSave" type="submit">Save appointment</button></div>
+  </form>
+</div>
+
+<!-- PASSWORD MODAL -->
+<div class="overlay" id="pwModal" hidden>
+  <form class="modal small" id="pwForm" novalidate role="dialog" aria-modal="true" aria-labelledby="pTitle">
+    <button class="x" type="button" data-close aria-label="Close">×</button>
+    <h2 id="pTitle">Change password</h2>
+    <label for="pNew">New password (min. 8 characters)</label>
+    <input type="password" id="pNew" autocomplete="new-password" required>
+    <label for="pNew2">Repeat new password</label>
+    <input type="password" id="pNew2" autocomplete="new-password" required>
+    <p class="msg" id="pMsg" role="alert"></p>
+    <div class="modal-actions"><span class="grow"></span>
+      <button class="btn ghost" type="button" data-close>Cancel</button>
+      <button class="btn" id="pSave" type="submit">Update password</button></div>
+  </form>
+</div>
+
+<div class="tip" id="tip" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script type="module" src="js/admin.js"></script>
+</body>
+</html>

@@ -60,6 +60,15 @@ Setup:
 3. Upload the new `index.html`, `firestore.rules` and `README.md` to GitHub; Vercel redeploys.
 4. See bookings in Firebase console > Firestore Database > Data > `appointments`.
 
+## Admin page
+
+`admin.html` (the "Admin" link in the site menu). Features: live list of bookings (updates by itself), charts (per day, by service, status, busiest times), stats, search / filters / sorting, status per booking (Pending, Confirmed, Completed, Cancelled), details with internal note, delete, add a phone / walk-in booking, change password, CSV export and print.
+
+1. Firebase console > Authentication > Users > **Add user**: `admin@gmail.com` + password. Do this first, before anyone can sign up with that email on the site.
+2. Firestore > Rules > paste the latest `firestore.rules` > Publish (only `admin@gmail.com` can read all, edit or delete; guests can only create and read their own).
+3. The admin email is set in `js/admin.js` (`ADMIN_EMAIL`) and in `firestore.rules`. The rules are what really protect the data.
+4. Use a strong password (the Password button in the dashboard changes it). The sign-in form is public, so a guessable password exposes every guest's name, phone and email.
+
 ## Notes
 
 - The Firebase web `apiKey` is not a secret; access is protected by Authentication and Firestore rules.
