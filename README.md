@@ -69,6 +69,13 @@ Setup:
 3. The admin email is set in `js/admin.js` (`ADMIN_EMAIL`) and in `firestore.rules`. The rules are what really protect the data.
 4. Use a strong password (the Password button in the dashboard changes it). The sign-in form is public, so a guessable password exposes every guest's name, phone and email.
 
+## Install as an app (PWA)
+
+`manifest.webmanifest`, `sw.js`, `js/pwa.js`, `favicon.ico` and the `icons/` folder make the site installable (white bai logo on orange). It needs HTTPS, which Vercel provides.
+- Android / Chrome / Edge: open the site > "Install App" in the menu (or the browser's install option).
+- iPhone: Safari > Share > Add to Home Screen.
+After a change to the site, bump `CACHE` in `sw.js` (e.g. `bai-hotel-v2`) only if old files seem stuck; HTML/CSS/JS are loaded network-first.
+
 ## Notes
 
 - The Firebase web `apiKey` is not a secret; access is protected by Authentication and Firestore rules.
