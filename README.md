@@ -50,24 +50,15 @@ Then open http://localhost:8080/
 - Name and email are pre-filled from the account.
 - Currently the confirmation is shown on screen only. Saving to a database (Firestore) is the next step.
 
-## Next step: save appointments to Firestore
+## Appointments are saved to Firestore
 
-1. Firebase console > Databases & Storage > Firestore Database > Create database (production mode).
-2. Rules:
+When a signed-in visitor presses Confirm Appointment, the booking is written to the Firestore collection `appointments` (with their `uid` and a server timestamp) before the confirmation is shown. If saving fails, an error is shown and the form is kept.
 
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /appointments/{id} {
-      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
-      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
-    }
-  }
-}
-```
-
-3. Then wire the booking form to write to the `appointments` collection with the user's `uid`.
+Setup:
+1. Firebase console > Build > Firestore Database > Create database (production mode, region e.g. `asia-southeast1`).
+2. Firestore > Rules tab > paste the contents of `firestore.rules` > Publish.
+3. Upload the new `index.html`, `firestore.rules` and `README.md` to GitHub; Vercel redeploys.
+4. See bookings in Firebase console > Firestore Database > Data > `appointments`.
 
 ## Notes
 

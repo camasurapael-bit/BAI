@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>bai Hotel Cebu — Reservations & Appointments</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="container">
+    <a href="#top" class="brand">
+      <span class="brand-mark">b</span>
+      <span class="brand-name">bai Hotel<small>Cebu · Mandaue</small></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#services">Experiences</a></li>
+      <li><a href="#about">The Hotel</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#testimonials">Reviews</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li class="nav-links-cta"><a href="#booking" class="btn btn-terra">Book Appointment</a></li>
+    </ul>
+    <a href="#booking" class="btn btn-terra nav-cta">Book Appointment</a>
+    <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="nav-backdrop" id="navBackdrop"></div>
+
+<header class="hero" id="top">
+  <div class="hero-bg"><img src="images/img-01.jpg" alt="bai Hotel Cebu at night"></div>
+  <div class="container hero-inner">
+    <span class="hero-tag"><span class="dot"></span>4.8 Rated · 17,500+ Reviews · Mactan Channel Views</span>
+    <h1>Where Cebu stays,<br><em>in style.</em></h1>
+    <p>A sleek glass landmark rising over the Mactan Channel — minutes from the airport, the ferry terminal, and the heart of the city. Reserve your stay, table, spa ritual, or pool day in under a minute.</p>
+    <div class="hero-cta">
+      <a href="#booking" class="btn btn-terra">Make an Appointment →</a>
+      <a href="#gallery" class="btn btn-ghost-dark">Explore the Hotel</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="container">
+      <div class="stat"><b data-count="4.8" data-dec="1">0</b><span>Google Rating</span></div>
+      <div class="stat"><b data-count="17562">0</b><span>Guest Reviews</span></div>
+      <div class="stat"><b data-count="668">0</b><span>Rooms & Suites</span></div>
+      <div class="stat"><b data-count="8">0</b><span>KM to Airport</span></div>
+    </div>
+  </div>
+</header>
+
+<section class="section services" id="services">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow light-eyebrow">Experiences</span>
+      <h2>Every appointment,<br><em>a little occasion.</em></h2>
+      <p>Choose what you'd like to reserve — our concierge confirms every booking personally within 2 hours.</p>
+    </div>
+    <div class="svc-grid">
+      <article class="svc-card reveal">
+        <div class="img-wrap">
+          <span class="svc-tag">01 · Stay</span>
+          <img src="images/img-02.jpg" alt="Deluxe room at bai Hotel Cebu">
+        </div>
+        <div class="svc-body">
+          <h3>Rooms & Suites</h3>
+          <p>Contemporary rooms and panoramic suites dressed in cool tones, plush bedding and channel views. Check-in 3:00 PM · Check-out 11:00 AM.</p>
+          <div class="svc-meta">
+            <div class="svc-price">₱5,000<small>per night from</small></div>
+            <a href="#booking" class="svc-link" data-service="Room Reservation">RESERVE →</a>
+          </div>
+        </div>
+      </article>
+      <article class="svc-card reveal">
+        <div class="img-wrap">
+          <span class="svc-tag">02 · Dine</span>
+          <img src="images/img-03.jpg" alt="Buffet spread at bai Hotel Cebu">
+        </div>
+        <div class="svc-body">
+          <h3>Dining & Buffet</h3>
+          <p>Cafe bai's acclaimed spreads, Marble + Grain steaks, Ume Japanese cuisine and Wallstreet coffee — reserve a table before the rush.</p>
+          <div class="svc-meta">
+            <div class="svc-price">₱1,200<small>per guest from</small></div>
+            <a href="#booking" class="svc-link" data-service="Dining Reservation">RESERVE →</a>
+          </div>
+        </div>
+      </article>
+      <article class="svc-card reveal">
+        <div class="img-wrap">
+          <span class="svc-tag">03 · Calm</span>
+          <img src="images/img-04.jpg" alt="Spa treatment room">
+        </div>
+        <div class="svc-body">
+          <h3>Spa & Wellness</h3>
+          <p>Melt into signature massages, body scrubs and recovery rituals in our serene treatment suites. Couples' rooms available.</p>
+          <div class="svc-meta">
+            <div class="svc-price">₱1,800<small>per session from</small></div>
+            <a href="#booking" class="svc-link" data-service="Spa Appointment">RESERVE →</a>
+          </div>
+        </div>
+      </article>
+      <article class="svc-card reveal">
+        <div class="img-wrap">
+          <span class="svc-tag">04 · Pool</span>
+          <img src="images/img-05.jpg" alt="Infinity pool at bai Hotel Cebu">
+        </div>
+        <div class="svc-body">
+          <h3>Pool Day Pass</h3>
+          <p>Escape to our rooftop lap pool with sweeping city views. Day passes include food & beverage consumables at the Pool Bar, 7 AM – 6 PM.</p>
+          <div class="svc-meta">
+            <div class="svc-price">₱650<small>per person from</small></div>
+            <a href="#booking" class="svc-link" data-service="Pool Day Pass">RESERVE →</a>
+          </div>
+        </div>
+      </article>
+      <article class="svc-card reveal">
+        <div class="img-wrap">
+          <span class="svc-tag">05 · Events</span>
+          <img src="images/img-06.jpg" alt="Suite living room at bai Hotel Cebu">
+        </div>
+        <div class="svc-body">
+          <h3>Events & Functions</h3>
+          <p>Grand ballrooms and intimate function rooms for weddings, debuts and corporate gatherings — with full catering by our chefs.</p>
+          <div class="svc-meta">
+            <div class="svc-price">Custom<small>request a quote</small></div>
+            <a href="#booking" class="svc-link" data-service="Event / Function">RESERVE →</a>
+          </div>
+        </div>
+      </article>
+      <article class="svc-card reveal">
+        <div class="img-wrap">
+          <span class="svc-tag">06 · Transit</span>
+          <img src="images/img-07.jpg" alt="Lobby lounge at bai Hotel Cebu">
+        </div>
+        <div class="svc-body">
+          <h3>Airport Transfer</h3>
+          <p>Arrive effortlessly. Private sedan or van transfers between Mactan–Cebu International Airport and the hotel, meet & greet included.</p>
+          <div class="svc-meta">
+            <div class="svc-price">₱900<small>per vehicle from</small></div>
+            <a href="#booking" class="svc-link" data-service="Airport Transfer">RESERVE →</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section about" id="about">
+  <div class="container split">
+    <div class="split-imgs reveal">
+      <div class="badge-experience"><b>4★</b><span>Polished Luxury</span></div>
+      <img class="main" src="images/img-08.jpg" alt="bai Hotel Cebu grand lobby">
+      <img class="float" src="images/img-09.jpg" alt="Rooftop pool at dusk">
+    </div>
+    <div class="split-text reveal">
+      <span class="eyebrow dark-eyebrow">The Hotel</span>
+      <h2>A glass landmark<br><em>on the Mactan Channel.</em></h2>
+      <p>Set in a striking contemporary tower between Cebu City and Mandaue, bai Hotel pairs cosmopolitan design with genuine Filipino warmth — from its soaring golden lobby to the rooftop pool overlooking the channel.</p>
+      <p>You're never far from anything: 4 km to the Cebu ferry terminal, 6 km to Magellan's Cross, and 8 km from the international airport.</p>
+      <ul class="check-list">
+        <li><span class="tick">✓</span>Free high-speed Wi-Fi</li>
+        <li><span class="tick">✓</span>Complimentary breakfast</li>
+        <li><span class="tick">✓</span>Free on-site parking</li>
+        <li><span class="tick">✓</span>Outdoor rooftop pool</li>
+        <li><span class="tick">✓</span>Fully accessible facilities</li>
+        <li><span class="tick">✓</span>8 on-site restaurants & bars</li>
+      </ul>
+      <a href="#booking" class="btn btn-ghost-dark">Plan Your Visit →</a>
+    </div>
+  </div>
+</section>
+
+<section class="section gallery" id="gallery">
+  <div class="container">
+    <div class="gallery-head reveal">
+      <div class="section-head" style="margin-bottom:0">
+        <span class="eyebrow light-eyebrow">Gallery</span>
+        <h2>A look <em>inside bai.</em></h2>
+        <p>Tap any photo to view it full-screen — glass, gold and golden hour.</p>
+      </div>
+      <div class="gallery-actions">
+        <button class="pill active">All</button>
+        <button class="pill">Rooms</button>
+        <button class="pill">Dining</button>
+        <button class="pill">Wellness</button>
+      </div>
+    </div>
+    <div class="gal-grid">
+      <div class="gal-item gal-tall reveal"><img src="images/img-01.jpg" alt="Hotel facade at night"><span class="cap"><span class="cap-text">The Tower at Night</span><span class="cap-tag">01</span></span></div>
+      <div class="gal-item reveal"><img src="images/img-02.jpg" alt="Deluxe room"><span class="cap"><span class="cap-text">Deluxe Room</span><span class="cap-tag">02</span></span></div>
+      <div class="gal-item reveal"><img src="images/img-10.jpg" alt="Buffet line at Cafe bai"><span class="cap"><span class="cap-text">Cafe bai Buffet</span><span class="cap-tag">03</span></span></div>
+      <div class="gal-item gal-tall reveal"><img src="images/img-09.jpg" alt="Rooftop pool at dusk"><span class="cap"><span class="cap-text">Rooftop Pool</span><span class="cap-tag">04</span></span></div>
+      <div class="gal-item gal-wide reveal"><img src="images/img-07.jpg" alt="Grand lobby"><span class="cap"><span class="cap-text">The Grand Lobby</span><span class="cap-tag">05</span></span></div>
+      <div class="gal-item reveal"><img src="images/img-11.jpg" alt="Restaurant dining room"><span class="cap"><span class="cap-text">Marble + Grain</span><span class="cap-tag">06</span></span></div>
+      <div class="gal-item reveal"><img src="images/img-12.jpg" alt="Room at night"><span class="cap"><span class="cap-text">Evening Turndown</span><span class="cap-tag">07</span></span></div>
+      <div class="gal-item gal-wide reveal"><img src="images/img-13.jpg" alt="Hotel exterior by day"><span class="cap"><span class="cap-text">Aerial View</span><span class="cap-tag">08</span></span></div>
+      <div class="gal-item reveal"><img src="images/img-04.jpg" alt="Spa suite"><span class="cap"><span class="cap-text">Spa Suite</span><span class="cap-tag">09</span></span></div>
+      <div class="gal-item reveal"><img src="images/img-06.jpg" alt="Suite living area"><span class="cap"><span class="cap-text">bai Suite</span><span class="cap-tag">10</span></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section booking" id="booking">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow dark-eyebrow">Reservations</span>
+      <h2>Make your <em>appointment.</em></h2>
+      <p>Fill in the details below — our concierge team confirms every request personally, usually within 2 hours.</p>
+    </div>
+    <div class="book-wrap reveal">
+      <div class="book-side">
+        <img src="images/img-11.jpg" alt="Dining at bai Hotel Cebu">
+        <div class="overlay">
+          <span class="panel-chip">Concierge · 24 / 7</span>
+          <h3 class="serif">Concierge, at your service.</h3>
+          <p>Prefer to talk it through? Call us any time — we're happy to tailor your stay.</p>
+          <ul>
+            <li><i>☎</i>+63 (032) 342 8888</li>
+            <li><i>✉</i>reservations@baihotels.com</li>
+            <li><i>◷</i>Open 24 hours · Front desk</li>
+          </ul>
+        </div>
+      </div>
+      <form class="book-form" id="bookForm" novalidate>
+        <h3 class="serif">Appointment Details</h3>
+        <p>Fields marked * are required.</p>
+        <div class="auth-bar" id="authBar"><span id="authBarText"></span><button type="button" id="signOutBtn">Sign out</button></div>
+        <div class="f-row">
+          <div class="f-group">
+            <label for="service">Service Type *</label>
+            <select id="service" required>
+              <option value="">Select a service…</option>
+              <option>Room Reservation</option>
+              <option>Dining Reservation</option>
+              <option>Spa Appointment</option>
+              <option>Pool Day Pass</option>
+              <option>Event / Function</option>
+              <option>Airport Transfer</option>
+            </select>
+            <span class="err">Please choose a service.</span>
+          </div>
+          <div class="f-group">
+            <label for="guests">Guests / Pax *</label>
+            <input type="number" id="guests" min="1" max="50" value="2" required>
+            <span class="err">Enter 1–50 guests.</span>
+          </div>
+        </div>
+        <div class="f-row">
+          <div class="f-group">
+            <label for="date">Preferred Date *</label>
+            <input type="date" id="date" required>
+            <span class="err">Please pick a date (today or later).</span>
+          </div>
+          <div class="f-group">
+            <label for="time">Preferred Time *</label>
+            <input type="time" id="time" min="07:00" max="20:00" step="1800" required>
+            <span class="err">Please choose a time between 7:00 AM and 8:00 PM.</span>
+          </div>
+        </div>
+        <div class="f-row">
+          <div class="f-group">
+            <label for="name">Full Name *</label>
+            <input type="text" id="name" placeholder="Juan Dela Cruz" required>
+            <span class="err">Please enter your name.</span>
+          </div>
+          <div class="f-group">
+            <label for="phone">Mobile Number *</label>
+            <input type="tel" id="phone" placeholder="+63 9XX XXX XXXX" required>
+            <span class="err">Enter a valid phone number.</span>
+          </div>
+        </div>
+        <div class="f-row">
+          <div class="f-group full">
+            <label for="email">Email *</label>
+            <input type="email" id="email" placeholder="you@email.com" autocomplete="email" required>
+            <span class="err">Enter a valid email address.</span>
+          </div>
+        </div>
+        <div class="f-row">
+          <div class="f-group">
+            <label for="coupon">Coupon Code <span style="font-size:.65rem;color:var(--text-light-3);letter-spacing:0;text-transform:none">— BAI10 for 10% off</span></label>
+            <input type="text" id="coupon" placeholder="Enter code">
+          </div>
+          <div class="f-group">
+            <label for="notes">Special Requests</label>
+            <input type="text" id="notes" placeholder="Occasions, allergies, preferences…">
+          </div>
+        </div>
+        <p class="form-note">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          We'll hold this appointment for 30 minutes while you complete booking.
+        </p>
+        <button type="submit" class="btn btn-terra submit-btn">Confirm Appointment →</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="section testi" id="testimonials">
+  <div class="container">
+    <div class="section-head reveal" style="margin-bottom:64px">
+      <span class="eyebrow light-eyebrow">Guest Reviews</span>
+      <h2>Loved by <em>17,000+</em> guests.</h2>
+      <p>Rated 4.8 on Google and 4.8/5 on Tripadvisor — here's what recent guests say.</p>
+    </div>
+    <div class="t-grid">
+      <div class="t-card reveal">
+        <span class="quote">&rdquo;</span>
+        <div class="stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+        <p>We truly enjoyed a wonderful post-birthday celebration with our daughter during our stay! A special thank you to In-Room Dining for the delightful service.</p>
+        <div class="t-user"><span class="t-avatar">T</span><div><b>Tripadvisor Guest</b><span>Family Stay · 2 weeks ago</span></div></div>
+      </div>
+      <div class="t-card reveal">
+        <span class="quote">&rdquo;</span>
+        <div class="stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+        <p>Went there to celebrate Thanksgiving with family and friends. It was an amazing experience — the staff made sure we had everything we needed all throughout.</p>
+        <div class="t-user"><span class="t-avatar">E</span><div><b>Erika Grace</b><span>Group Celebration · 2 months ago</span></div></div>
+      </div>
+      <div class="t-card reveal">
+        <span class="quote">&rdquo;</span>
+        <div class="stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+        <p>Super clean hotel, with amazing location. They have security outside all the time, and the staff were amazing — 9.1/10 on Priceline, and we agree.</p>
+        <div class="t-user"><span class="t-avatar">T</span><div><b>Trip.com Member</b><span>Leisure Stay · 3 months ago</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="container foot-grid">
+    <div class="foot-brand">
+      <a href="#top" class="brand">
+        <span class="brand-mark">b</span>
+        <span class="brand-name">bai Hotel<small>Cebu · Mandaue</small></span>
+      </a>
+      <p>A polished 4-star landmark on Ouano Avenue — glass, gold and channel views, minutes from everything Cebu.</p>
+      <div class="socials">
+        <a href="https://www.facebook.com/baiHotelCebuPH/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">f</a>
+        <a href="https://www.instagram.com/baihotel_cebu/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">◎</a>
+        <a href="https://twitter.com/baihotelcebu" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter" title="X (Twitter">𝕏</a>
+        <a href="https://www.tiktok.com/@baihotelcebu_" target="_blank" rel="noopener noreferrer" aria-label="TikTok" title="TikTok">♪</a>
+        <a href="https://www.youtube.com/channel/UC_9dclcB9j5_b77OjE8r7yg" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube">▶</a>
+        <a href="https://www.linkedin.com/company/bai-hotel-cebu/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn">in</a>
+      </div>
+    </div>
+    <div>
+      <h4>Explore</h4>
+      <ul class="foot-links">
+        <li><a href="#services">Experiences</a></li>
+        <li><a href="#about">The Hotel</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#booking">Reservations</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Services</h4>
+      <ul class="foot-links">
+        <li><a href="#booking">Rooms & Suites</a></li>
+        <li><a href="#booking">Dining & Buffet</a></li>
+        <li><a href="#booking">Spa & Wellness</a></li>
+        <li><a href="#booking">Events & Functions</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <ul class="foot-contact">
+        <li><i>◈</i>Ouano Avenue, corner C.D. Seno, Mandaue, 6014 Cebu, Philippines</li>
+        <li><i>☎</i>+63 (032) 342 8888</li>
+        <li><i>✉</i>baihotels.com · reservations@baihotels.com</li>
+        <li><i>◷</i>Check-in 3:00 PM · Check-out 11:00 AM</li>
+        <li><i>✈</i>8 km from Mactan–Cebu International Airport</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-bar">
+    <div class="container">
+      <div class="row">
+        <span>© 2026 <b>bai Hotel Cebu</b> · All rights reserved.</span>
+        <span>Plus code: <b>8WFP+WP Mandaue, Cebu</b></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="check-ring">✓</div>
+    <h3 class="serif">Appointment Requested!</h3>
+    <p id="modalSummary">Your request has been sent to our concierge.</p>
+    <div class="ref-code" id="refCode">BAI-000000</div>
+    <p style="font-size:.78rem">A confirmation SMS and email will reach you within 2 hours.</p>
+    <button class="btn btn-terra" id="modalClose" style="margin-top:18px">Done</button>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <button class="close" id="lbClose">✕</button>
+  <img id="lbImg" src="" alt="Gallery photo enlarged">
+</div>
+
+<div class="modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="modal-box auth-box">
+    <button class="auth-close" id="authClose" aria-label="Close">&times;</button>
+    <div class="auth-eyebrow">Account required to book</div>
+    <h3 id="authTitle">Sign in to <em>bai Hotel</em></h3>
+    <p class="auth-sub" id="authSub"></p>
+    <div class="auth-tabs" role="tablist">
+      <button type="button" class="auth-tab" id="tabLogin" role="tab">Log in</button>
+      <button type="button" class="auth-tab active" id="tabSignup" role="tab">Create account</button>
+    </div>
+    <div class="auth-msg" id="authMsg" role="alert"></div>
+    <button type="button" class="btn btn-google" id="googleBtn"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.9 2.4 30.4 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.9-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>Continue with Google</button>
+    <div class="auth-or">or use your email</div>
+    <form class="auth-form" id="authForm" novalidate>
+      <div class="f-group" id="nameGroup"><label for="authName">Full name</label><input id="authName" type="text" autocomplete="name" placeholder="Juan Dela Cruz"><span class="err">Please enter your name.</span></div>
+      <div class="f-group"><label for="authEmail">Email</label><input id="authEmail" type="email" autocomplete="email" placeholder="you@example.ph"><span class="err">Enter a valid email.</span></div>
+      <div class="f-group"><label for="authPass">Password</label><input id="authPass" type="password" autocomplete="new-password" placeholder="At least 6 characters"><span class="err">Password must be at least 6 characters.</span></div>
+      <button type="button" class="auth-link" id="forgotBtn" style="display:none">Forgot password?</button>
+      <button type="submit" class="btn btn-terra" id="authSubmit">Create account</button>
+    </form>
+    <p class="auth-fine">One account keeps your appointments and confirmations in one place.</p>
+  </div>
+</div>
+
+<script type="module" src="js/auth.js"></script>
+<script src="js/main.js"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
