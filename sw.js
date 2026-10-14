@@ -1,9 +1,9 @@
 /* bai Hotel service worker: makes the site installable and keeps the shell available offline.
    HTML/CSS/JS: network first (so updates show immediately), cache as fallback.
    Images/icons: cache first. Firebase, fonts and other sites are never touched. */
-const CACHE = 'bai-hotel-v3';
+const CACHE = 'bai-hotel-v5';
 const SHELL = ['./', 'index.html', 'admin.html', 'css/styles.css', 'css/admin.css', 'js/main.js', 'js/auth.js', 'js/admin.js',
-  'js/pwa.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
+  'js/pwa.js', 'js/qr.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => Promise.all(SHELL.map(u => c.add(u).catch(() => {})))).then(() => self.skipWaiting()));

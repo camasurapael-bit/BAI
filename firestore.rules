@@ -10,6 +10,7 @@ service cloud.firestore {
       // Guests create their own booking (no status field: the admin sets it).
       // The admin can also create bookings (phone / walk-in).
       allow create: if request.auth != null
+        && (isAdmin() || request.auth.token.email_verified == true)
         && request.resource.data.uid == request.auth.uid
         && (isAdmin() || !('status' in request.resource.data))
         && request.resource.data.guests is int

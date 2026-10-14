@@ -25,6 +25,7 @@ const app = initializeApp({
 const auth = getAuth(app), db = getFirestore(app);
 const $ = id => document.getElementById(id);
 let all = [], unsub = null, firstSnap = true, range = 'past', openId = null;
+let scanRef = new URLSearchParams(location.search).get('ref');   // opened from a receipt QR code
 
 /* ---------- helpers ---------- */
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -65,6 +66,24 @@ onAuthStateChanged(auth, u => {
   startLive();
 });
 
+/* ---------- email the guest (via /api/notify, Brevo) ---------- */
+async function notifyGuest(a, status, message){
+  if (!a || !a.email) return 'no-email';
+  const token = await auth.currentUser.getIdToken();
+  const r = await fetch('/api/notify', {method:'POST', headers:{'Content-Type':'application/json', Authorization:'Bearer '+token},
+    body: JSON.stringify({type:'status', status, message:message||'', to:a.email, name:a.fullName, ref:a.refCode, service:a.service, guests:a.guests, apptDate:a.apptDate, apptTime:a.apptTime})});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || ('Email failed ('+r.status+')'));
+  return 'sent';
+}
+const MAILABLE = {confirmed:1, cancelled:1, completed:1};
+async function saveStatus(a, status, message){
+  await updateDoc(doc(db,'appointments',a.id), {status, updatedAt:serverTimestamp()});
+  if (!MAILABLE[status]) return toast('Status: '+STATUSES[status].label);
+  try { const r = await notifyGuest(a, status, message); toast('Status: '+STATUSES[status].label+(r==='sent' ? ' · email sent to guest' : ' · no email on file')); }
+  catch(e){ toast('Saved, but email not sent: '+e.message); }
+}
+
 /* ---------- live data ---------- */
 function startLive(){
   stopLive(); firstSnap = true;
@@ -77,7 +96,9 @@ function startLive(){
     firstSnap = false;
     all = snap.docs.map(d => ({id:d.id, ...d.data()}));
     $('live').className = 'live on'; $('liveTxt').textContent = 'Live · updates automatically';
-    refreshServiceFilter(); renderAll();
+    refreshServiceFilter();
+    if (scanRef){ $('q').value = scanRef; const hit = all.find(x => x.refCode === scanRef); scanRef = null; renderAll(); if (hit) openDetail(hit.id); }
+    else renderAll();
     if (openId) { const a = all.find(x=>x.id===openId); if (a) fillDetail(a, true); else closeModals(); }
   }, err => {
     $('live').className = 'live'; $('liveTxt').textContent = 'Not connected';
@@ -148,8 +169,10 @@ function renderAll(){ renderStats(); renderList(); drawCharts(); }
 /* inline status + open details */
 $('rows').addEventListener('change', async e => {
   const sel = e.target.closest('.st'); if (!sel) return;
+  const a = all.find(x => x.id === sel.dataset.id); if (!a) return;
+  if (sel.value === 'cancelled' && !confirm('Decline / cancel '+a.refCode+' and email the guest?')){ renderList(); return; }
   sel.dataset.s = sel.value;
-  try { await updateDoc(doc(db,'appointments',sel.dataset.id), {status:sel.value, updatedAt:serverTimestamp()}); toast('Status: '+STATUSES[sel.value].label); }
+  try { await saveStatus(a, sel.value, ''); }
   catch(err){ toast(friendly(err)); }
 });
 $('rows').addEventListener('click', e => {
@@ -168,13 +191,19 @@ function fillDetail(a, keepEdits){
   ].filter(r => r[1] !== undefined && r[1] !== null && r[1] !== '');
   const dl = $('dBody'); dl.textContent = '';
   rows.forEach(([k,v]) => { const dt=document.createElement('dt'); dt.textContent=k; const dd=document.createElement('dd'); dd.textContent=v; dl.append(dt,dd); });
-  if (!keepEdits){ $('dStatus').value = stOf(a); $('dNote').value = a.adminNote || ''; setMsg('dMsg',''); }
+  if (!keepEdits){ $('dStatus').value = stOf(a); $('dNote').value = a.adminNote || ''; $('dGuestMsg').value = ''; setMsg('dMsg',''); }
 }
 $('dSave').onclick = async () => {
   if (!openId) return; setMsg('dMsg',''); $('dSave').disabled = true;
   try {
-    await updateDoc(doc(db,'appointments',openId), {status:$('dStatus').value, adminNote:$('dNote').value.trim().slice(0,500), updatedAt:serverTimestamp()});
-    toast('Saved'); closeModals();
+    const a = all.find(x => x.id === openId), ns = $('dStatus').value, changed = a && stOf(a) !== ns, gm = $('dGuestMsg').value.trim().slice(0,500);
+    if (changed && ns === 'cancelled' && !confirm('Decline / cancel this appointment and email the guest?')){ $('dSave').disabled = false; return; }
+    await updateDoc(doc(db,'appointments',openId), {status:ns, adminNote:$('dNote').value.trim().slice(0,500), updatedAt:serverTimestamp()});
+    if (changed && MAILABLE[ns]){
+      try { const r = await notifyGuest(a, ns, gm); toast('Saved'+(r==='sent' ? ' · email sent to guest' : ' · no email on file')); }
+      catch(e){ toast('Saved, but email not sent: '+e.message); }
+    } else toast('Saved');
+    closeModals();
   } catch(e){ setMsg('dMsg', friendly(e)); }
   $('dSave').disabled = false;
 };
@@ -202,12 +231,15 @@ $('newForm').addEventListener('submit', async ev => {
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setMsg('nMsg','Email looks invalid.');
   $('nSave').disabled = true;
   try {
-    await addDoc(collection(db,'appointments'), {
+    const rec = {
       refCode:'BAI-'+Math.random().toString(36).slice(2,8).toUpperCase(), uid:auth.currentUser.uid, accountEmail:auth.currentUser.email,
       service:v('nService'), guests, apptDate:v('nDate'), apptTime:time, fullName:v('nName'), phone, email,
       coupon:null, notes:v('nNotes')||null, status:'confirmed', source:'admin', createdAt:serverTimestamp()
-    });
-    toast('Appointment added'); closeModals();
+    };
+    await addDoc(collection(db,'appointments'), rec);
+    closeModals();
+    if (email){ try { await notifyGuest(rec, 'confirmed', ''); toast('Appointment added · confirmation emailed'); } catch(e){ toast('Added, but email not sent: '+e.message); } }
+    else toast('Appointment added');
   } catch(e){ setMsg('nMsg', friendly(e)); }
   $('nSave').disabled = false;
 });

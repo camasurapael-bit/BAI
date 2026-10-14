@@ -127,6 +127,7 @@ button{font:inherit}
 .nav-links a::after{content:"";position:absolute;left:50%;bottom:0;width:0;height:2px;background:var(--terra-soft);transition:width .3s var(--ease),left .3s var(--ease)}
 .nav-links a:hover::after{width:100%;left:0}
 .nav-links .nav-links-cta{display:none}
+.nav-links li[hidden]{display:none!important}
 .hamburger{display:none;background:none;border:none;cursor:pointer;position:relative;width:44px;height:44px;-webkit-tap-highlight-color:transparent}
 .hamburger span{position:absolute;left:10px;right:10px;height:2px;border-radius:2px;background:var(--text-dark);transition:transform .3s,opacity .2s,top .3s}
 .hamburger span:nth-child(1){top:15px}.hamburger span:nth-child(2){top:21px}.hamburger span:nth-child(3){top:27px}
@@ -468,3 +469,15 @@ footer h4::before{content:"";width:18px;height:1px;background:var(--terra-soft)}
   .form-note{margin:8px 0 14px;padding:9px 11px;font-size:.72rem}
   .submit-btn{padding:15px}
 }
+
+
+/* ===== receipt QR ===== */
+.qr-box{display:inline-block;background:#fff;border:1px solid var(--line-light);border-radius:14px;padding:8px;margin:0 0 8px;line-height:0;box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.qr-box svg{width:168px;height:168px;display:block}
+.qr-cap{font-size:.78rem;margin-bottom:6px}
+.modal-box .ref-code{margin:14px 0 14px}
+.modal-box .receipt-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.modal-box .receipt-actions .btn{margin:0;padding:14px 10px}
+.btn-outline-dark{background:transparent;border:1.5px solid var(--terra);color:var(--terra);font-weight:700;cursor:pointer;border-radius:999px}
+.btn-outline-dark:hover{background:rgba(198,106,58,.1)}
+@media(max-width:680px){.modal-box{padding:28px 20px}.qr-box svg{width:150px;height:150px}}

@@ -26,6 +26,27 @@ document.querySelectorAll('.svc-link').forEach(l=>l.addEventListener('click',()=
 document.querySelectorAll('.gallery-actions .pill').forEach(p=>p.addEventListener('click',()=>{document.querySelectorAll('.gallery-actions .pill').forEach(x=>x.classList.remove('active'));p.classList.add('active')}));
 
 const form=document.getElementById('bookForm'),modal=document.getElementById('modal');
+let lastReceipt=null;
+/* Save the receipt (with QR) as a PNG image */
+document.getElementById('saveReceipt').addEventListener('click',function(){
+  if(!lastReceipt)return;
+  var r=lastReceipt,W=640,H=900,c=document.createElement('canvas');c.width=W;c.height=H;var x=c.getContext('2d');
+  x.fillStyle='#f7f3ec';x.fillRect(0,0,W,H);
+  x.fillStyle='#c66a3a';x.fillRect(0,0,W,150);
+  x.fillStyle='#fff';x.textAlign='center';x.font='600 44px Georgia, serif';x.fillText('bai Hotel',W/2,78);
+  x.font='500 15px Arial, sans-serif';x.fillText('CEBU \u00B7 MANDAUE',W/2,110);
+  x.fillStyle='#16244a';x.font='600 30px Georgia, serif';x.fillText('Appointment Receipt',W/2,218);
+  x.fillStyle='#c66a3a';x.font='700 34px Courier New, monospace';x.fillText(r.ref,W/2,272);
+  var rows=[['Service',r.service],['Date & time',r.when],['Guests',String(r.guests)],['Name',r.name],['Mobile',r.phone]],y=330;
+  rows.forEach(function(p){x.textAlign='left';x.fillStyle='#7a8194';x.font='700 14px Arial, sans-serif';x.fillText(p[0].toUpperCase(),60,y);
+    x.fillStyle='#16244a';x.font='600 20px Arial, sans-serif';x.textAlign='right';x.fillText(p[1],W-60,y+1);
+    x.strokeStyle='#e3dccf';x.beginPath();x.moveTo(60,y+16);x.lineTo(W-60,y+16);x.stroke();y+=54;});
+  try{window.baiQR.canvas(x,location.origin+'/admin.html?ref='+encodeURIComponent(r.ref),W/2-110,y+14,220)}catch(e){}
+  x.textAlign='center';x.fillStyle='#7a8194';x.font='500 15px Arial, sans-serif';
+  x.fillText('Show this QR code at the front desk.',W/2,y+270);
+  x.fillText('Status: pending confirmation',W/2,y+296);
+  c.toBlob(function(b){var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='bai-receipt-'+r.ref+'.png';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},2000)},'image/png');
+});
 /* Appointments are saved to Firestore (collection: appointments) via window.baiAuth.saveAppointment */
 function saveAppointment(row){ return window.baiAuth.saveAppointment(row); }
 function setV(i,o){i.closest('.f-group').classList.toggle('invalid',!o);return o}
@@ -62,6 +83,10 @@ form.addEventListener('submit',async e=>{
   btn.disabled=false;btn.textContent=btnTxt;
   document.getElementById('refCode').textContent=ref;
   const d=new Date(dI.value+'T'+tS.value+':00');
+  lastReceipt={ref:ref,service:svc.value,guests:gx.value,apptDate:dI.value,apptTime:tS.value,name:nm.value.trim(),phone:ph.value.trim(),when:d.toLocaleDateString('en-PH',{weekday:'long',month:'long',day:'numeric',year:'numeric'})+' · '+fmtTime(tS.value)};
+  var qrUrl=location.origin+'/admin.html?ref='+encodeURIComponent(ref);
+  try{document.getElementById('qrBox').innerHTML=window.baiQR.svg(qrUrl,168)}catch(e){}
+  window.baiAuth.notify({type:'received',ref:ref,name:nm.value.trim(),service:svc.value,guests:parseInt(gx.value,10),apptDate:dI.value,apptTime:tS.value}).catch(function(){});
   document.getElementById('modalSummary').innerHTML='<b>'+svc.value+'</b> for <b>'+gx.value+' guest(s)</b><br>'+d.toLocaleDateString('en-PH',{weekday:'long',month:'long',day:'numeric',year:'numeric'})+' · '+fmtTime(tS.value)+'<br>Under the name <b>'+nm.value.trim()+'</b>';
   modal.classList.add('open');form.reset();gx.value=2;
 });

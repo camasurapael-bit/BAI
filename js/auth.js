@@ -77,6 +77,13 @@ window.baiAuth = {
     const {F,db} = await loadFirebase();
     await F.addDoc(F.collection(db,'appointments'), {...data, uid:user.uid, createdAt:F.serverTimestamp()});
   },
+  /* email the signed-in guest their receipt (server: /api/notify) */
+  notify: async payload => {
+    if (!user) return;
+    const token = await user.getIdToken();
+    const r = await fetch('/api/notify', {method:'POST', headers:{'Content-Type':'application/json', Authorization:'Bearer '+token}, body:JSON.stringify(payload)});
+    if (!r.ok) throw new Error('email ' + r.status);
+  },
   /* run cb once the visitor is signed in; shows account creation if not */
   require: async cb => {
     await Promise.race([ready, new Promise(r=>setTimeout(r,4000))]);
@@ -101,7 +108,8 @@ function friendly(err){
     'auth/unauthorized-domain':'This domain is not authorized in Firebase (Authentication > Settings > Authorized domains).',
     'auth/operation-not-supported-in-this-environment':'Google sign-in needs http(s) or localhost, not a file:// page.',
     'auth/network-request-failed':'Network error. Check your connection.',
-    'auth/too-many-requests':'Too many attempts. Try again in a few minutes.'
+    'auth/too-many-requests':'Too many attempts. Try again in a few minutes.',
+    'auth/missing-email':'Please enter your email.'
   };
   return map[c] || (err && err.message) || 'Something went wrong. Please try again.';
 }
@@ -113,13 +121,15 @@ async function loadFirebase(){
   const [{initializeApp},A,F] = await Promise.all([import(base+'firebase-app.js'), import(base+'firebase-auth.js'), import(base+'firebase-firestore.js')]);
   const app = initializeApp(firebaseConfig), auth = A.getAuth(app), db = F.getFirestore(app);
   fb = {A, auth, F, db};
-  A.onAuthStateChanged(auth, u=>{ user=u; renderUser(); readyResolve(); });
+  /* only verified accounts count as signed in (Google is verified automatically; the admin account is exempt) */
+  A.onAuthStateChanged(auth, u=>{ user = (u && (u.emailVerified || isAdminUser(u))) ? u : null; renderUser(); readyResolve(); });
   return fb;
 }
 function renderUser(){
   const bar=$('authBar');
   if (user){ $('authBarText').textContent = 'Signed in as ' + (user.displayName || user.email); bar.classList.add('show'); $('adminLink').hidden = !isAdminUser(user); }
   else bar.classList.remove('show');
+  const nd = $('navDashboard'); if (nd) nd.hidden = !isAdminUser(user);
 }
 if (configured) loadFirebase().catch(()=>{});   // restore session on page load
 
@@ -148,13 +158,24 @@ form.addEventListener('submit', async ev=>{
   try{
     const {A,auth} = await loadFirebase();
     if (mode==='signup'){
-      const cred = await A.createUserWithEmailAndPassword(auth, email.value.trim(), pass.value);
+      const addr = email.value.trim();
+      const cred = await A.createUserWithEmailAndPassword(auth, addr, pass.value);
       await A.updateProfile(cred.user, {displayName:name.value.trim()});
-      user = cred.user;
+      await A.sendEmailVerification(cred.user);
+      await A.signOut(auth); user = null; renderUser();
+      form.reset(); setMode('login'); email.value = addr;
+      show('Account created! We sent a verification link to ' + addr + '. Open it (check Spam too), then log in here.','info');
     } else {
-      user = (await A.signInWithEmailAndPassword(auth, email.value.trim(), pass.value)).user;
+      const cred = await A.signInWithEmailAndPassword(auth, email.value.trim(), pass.value);
+      if (!cred.user.emailVerified && !isAdminUser(cred.user)){
+        let sent = true;
+        try{ await A.sendEmailVerification(cred.user); }catch(e){ sent = false; }
+        await A.signOut(auth); user = null; renderUser();
+        show('Please verify your email first. ' + (sent ? 'We just sent a new verification link to ' + email.value.trim() + '.' : 'A verification link was already sent, so check your inbox and Spam folder.'));
+        busy(false); return;
+      }
+      user = cred.user; renderUser(); form.reset(); goBooking();
     }
-    renderUser(); form.reset(); goBooking();
   }catch(err){ show(friendly(err)); }
   busy(false);
 });

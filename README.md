@@ -48,7 +48,25 @@ Then open http://localhost:8080/
 - Any "Book Appointment" / "Reserve" button opens the account modal if the visitor is not signed in.
 - Pressing **Confirm Appointment** without an account also opens it; after login the appointment is submitted automatically.
 - Name and email are pre-filled from the account.
-- Currently the confirmation is shown on screen only. Saving to a database (Firestore) is the next step.
+
+## Account creation and email verification
+
+- Creating an account does NOT log the visitor in. A verification link is emailed, the visitor is signed out, and must open the link and then log in.
+- Logging in with an unverified email is refused (a new link is sent). Google sign-in counts as verified. Only the admin account is exempt.
+- `firestore.rules` also requires a verified email to create a booking, so republish the rules after updating.
+- Optional: Firebase console > Authentication > Templates > Email address verification lets you customise the email text and sender name.
+
+## Receipt QR code and emails
+
+- After **Confirm Appointment** the receipt shows a QR code (it opens `admin.html?ref=BAI-XXXXXX`, so the admin scans it and lands on that booking). **Save receipt** downloads the receipt as a PNG. `js/qr.js` generates the QR in the browser (no internet needed).
+- Emails are sent by `api/notify.js` (a Vercel serverless function) through **Brevo**:
+  - guest gets a receipt email (with the QR) right after booking;
+  - when the admin sets a booking to **Confirmed**, **Cancelled** (declined) or **Completed**, the guest gets an email. The detail window has an optional "Message to guest" that is added to the email. Phone / walk-in bookings with an email are emailed as Confirmed.
+- Setup:
+  1. Brevo account > SMTP & API > create an **API key**. Brevo > Senders, Domains & IPs > add and verify a **sender email**.
+  2. Vercel > Project > Settings > Environment Variables: `BREVO_API_KEY`, `SENDER_EMAIL`, and optionally `SITE_URL` (e.g. `https://baihotel-app.vercel.app`). Redeploy.
+  3. Keep the `api/` folder in the repo root next to `index.html`.
+- Only the admin session can trigger status emails, and the receipt email always goes to the signed-in guest's own verified address.
 
 ## Appointments are saved to Firestore
 
@@ -62,7 +80,7 @@ Setup:
 
 ## Admin page
 
-`admin.html`. There is no Admin button on the website: the admin signs in with the normal "Log in" form on `index.html` (email + password of `admin@gmail.com`) and is sent to the dashboard automatically. When already signed in, a "Dashboard" link shows in the signed-in bar (visible to the admin only). Anyone else who opens `admin.html` is sent back to the website; sign out returns to the website too. Features: live list of bookings (updates by itself), charts (per day, by service, status, busiest times), stats, search / filters / sorting, status per booking (Pending, Confirmed, Completed, Cancelled), details with internal note, delete, add a phone / walk-in booking, change password, CSV export and print.
+`admin.html`. There is no public Admin button on the website. After the admin logs in, a "Dashboard" button appears in the site menu (admin only) so they can go back to the dashboard without logging in again; the dashboard menu has a "Website" button to view the site. Otherwise: the admin signs in with the normal "Log in" form on `index.html` (email + password of `admin@gmail.com`) and is sent to the dashboard automatically. When already signed in, a "Dashboard" link shows in the signed-in bar (visible to the admin only). Anyone else who opens `admin.html` is sent back to the website; sign out returns to the website too. Features: live list of bookings (updates by itself), charts (per day, by service, status, busiest times), stats, search / filters / sorting, status per booking (Pending, Confirmed, Completed, Cancelled), details with internal note, delete, add a phone / walk-in booking, change password, CSV export and print.
 
 1. Firebase console > Authentication > Users > **Add user**: `admin@gmail.com` + password. Do this first, before anyone can sign up with that email on the site.
 2. Firestore > Rules > paste the latest `firestore.rules` > Publish (only `admin@gmail.com` can read all, edit or delete; guests can only create and read their own).

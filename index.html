@@ -32,6 +32,7 @@
       <li><a href="#gallery">Gallery</a></li>
       <li><a href="#testimonials">Reviews</a></li>
       <li><a href="#contact">Contact</a></li>
+      <li id="navDashboard" hidden><a href="admin.html">Dashboard</a></li>
       <li><a href="#" class="nav-admin" data-install hidden>Install App</a></li>
       <li class="nav-links-cta"><a href="#booking" class="btn btn-terra">Book Appointment</a></li>
     </ul>
@@ -236,11 +237,11 @@
       </div>
       <form class="book-form" id="bookForm" novalidate>
         <h3 class="serif">Appointment Details</h3>
-        <p>Fields marked * are required.</p>
+        <p>Fill in your details to book.</p>
         <div class="auth-bar" id="authBar"><span id="authBarText"></span><span><a href="admin.html" id="adminLink" hidden>Dashboard</a> <button type="button" id="signOutBtn">Sign out</button></span></div>
         <div class="f-row one">
           <div class="f-group full">
-            <label for="service">Service Type *</label>
+            <label for="service">Service Type</label>
             <select id="service" required>
               <option value="">Select a service…</option>
               <option>Room Reservation</option>
@@ -255,38 +256,38 @@
         </div>
         <div class="f-row">
           <div class="f-group">
-            <label for="date">Date *</label>
+            <label for="date">Date</label>
             <input type="date" id="date" required>
             <span class="err">Pick a date (today or later).</span>
           </div>
           <div class="f-group">
-            <label for="time">Time *</label>
+            <label for="time">Time</label>
             <input type="time" id="time" min="07:00" max="20:00" step="1800" required>
             <span class="err">Choose 7:00 AM – 8:00 PM.</span>
           </div>
         </div>
         <div class="f-row r-guests">
           <div class="f-group">
-            <label for="guests">Guests *</label>
+            <label for="guests">Guests</label>
             <input type="number" id="guests" min="1" max="50" value="2" inputmode="numeric" required>
             <span class="err">1–50 guests.</span>
           </div>
           <div class="f-group">
-            <label for="phone">Mobile Number *</label>
+            <label for="phone">Mobile Number</label>
             <input type="tel" id="phone" placeholder="+63 9XX XXX XXXX" autocomplete="tel" required>
             <span class="err">Enter a valid phone number.</span>
           </div>
         </div>
         <div class="f-row one">
           <div class="f-group full">
-            <label for="name">Full Name *</label>
+            <label for="name">Full Name</label>
             <input type="text" id="name" placeholder="Juan Dela Cruz" autocomplete="name" required>
             <span class="err">Please enter your name.</span>
           </div>
         </div>
         <div class="f-row one">
           <div class="f-group full">
-            <label for="email">Email *</label>
+            <label for="email">Email</label>
             <input type="email" id="email" placeholder="you@email.com" autocomplete="email" required>
             <span class="err">Enter a valid email address.</span>
           </div>
@@ -403,8 +404,13 @@
     <h3 class="serif">Appointment Requested!</h3>
     <p id="modalSummary">Your request has been sent to our concierge.</p>
     <div class="ref-code" id="refCode">BAI-000000</div>
-    <p style="font-size:.78rem">A confirmation SMS and email will reach you within 2 hours.</p>
-    <button class="btn btn-terra" id="modalClose" style="margin-top:18px">Done</button>
+    <div class="qr-box" id="qrBox" aria-label="Receipt QR code"></div>
+    <p class="qr-cap">Show this QR code at the front desk.</p>
+    <p style="font-size:.78rem">We'll email you when your appointment is confirmed or declined.</p>
+    <div class="receipt-actions">
+      <button class="btn btn-outline-dark" id="saveReceipt" type="button">Save receipt</button>
+      <button class="btn btn-terra" id="modalClose" type="button">Done</button>
+    </div>
   </div>
 </div>
 
@@ -438,6 +444,7 @@
 </div>
 
 <script type="module" src="js/auth.js"></script>
+<script src="js/qr.js"></script>
 <script src="js/main.js"></script>
 <script src="js/pwa.js"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>

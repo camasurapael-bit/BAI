@@ -124,6 +124,9 @@
       <option value="pending">Pending</option><option value="confirmed">Confirmed</option>
       <option value="completed">Completed</option><option value="cancelled">Cancelled</option>
     </select>
+    <label for="dGuestMsg">Message to guest (optional, added to the email)</label>
+    <textarea id="dGuestMsg" rows="2" maxlength="500" placeholder="e.g. Sorry, we are fully booked at that time. Please try another date."></textarea>
+    <p class="hint">An email is sent to the guest when you change the status to Confirmed, Cancelled or Completed.</p>
     <label for="dNote">Internal note (guests never see this)</label>
     <textarea id="dNote" rows="3" maxlength="500" placeholder="e.g. Called guest, confirmed by phone."></textarea>
     <p class="msg" id="dMsg" role="alert"></p>
