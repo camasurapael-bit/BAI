@@ -54,24 +54,15 @@ function friendly(e){
 const setMsg = (id, text, ok) => { const m=$(id); m.textContent=text||''; m.className='msg'+(ok?' info':''); };
 
 /* ---------- auth ---------- */
-$('loginForm').addEventListener('submit', async ev => {
-  ev.preventDefault(); setMsg('loginMsg','');
-  const email = $('aEmail').value.trim(), pass = $('aPass').value;
-  if (!email || !pass){ setMsg('loginMsg','Enter email and password.'); return; }
-  $('loginBtn').disabled = true;
-  try { await signInWithEmailAndPassword(auth, email, pass); }
-  catch(e){ setMsg('loginMsg', friendly(e)); }
-  $('loginBtn').disabled = false;
-});
-$('logoutBtn').onclick = () => signOut(auth);
+$('logoutBtn').onclick = async () => { try { await signOut(auth); } finally { location.replace('index.html'); } };
 
+/* Admin signs in on the main website (index.html). Anyone else is sent back there. */
 onAuthStateChanged(auth, u => {
   const isAdmin = !!u && (u.email||'').toLowerCase() === ADMIN_EMAIL;
-  if (u && !isAdmin){ signOut(auth); setMsg('loginMsg','This account is not an admin.'); return; }
-  $('loginView').hidden = isAdmin;
-  $('dashView').hidden = !isAdmin;
-  if (isAdmin){ $('who').textContent = u.email; $('aPass').value=''; startLive(); }
-  else { stopLive(); all = []; }
+  if (!isAdmin){ stopLive(); all = []; location.replace('index.html'); return; }
+  $('dashView').hidden = false;
+  $('who').textContent = u.email;
+  startLive();
 });
 
 /* ---------- live data ---------- */
@@ -367,7 +358,8 @@ function drawCharts(){
   const byHour = {}; liveRows.forEach(a => { const h = parseInt((a.apptTime||'').split(':')[0],10); if (!isNaN(h)) byHour[h] = (byHour[h]||0)+1; });
   const hours = []; for (let h=7; h<=20; h++) hours.push(h);
   const hl = h => ((h%12)||12)+(h>=12?'PM':'AM');
-  columnChart($('p4'), hours.map(h => ({v:byHour[h]||0, tip:hl(h)+' – '+hl(h+1), tick:hl(h)})), {h:200});
+  const narrow = $('p4').clientWidth < 560;
+  columnChart($('p4'), hours.map((h,i) => ({v:byHour[h]||0, tip:hl(h)+' – '+hl(h+1), tick:(narrow && i%2) ? '' : hl(h)})), {h:200});
 }
 
 $('rangeSeg').addEventListener('click', e => {

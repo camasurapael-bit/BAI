@@ -422,6 +422,49 @@ footer h4::before{content:"";width:18px;height:1px;background:var(--terra-soft)}
 .auth-fine{margin-top:16px;text-align:center;font-size:.72rem;color:var(--text-dark-3)}
 .auth-bar{display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(42,143,138,.1);border:1px solid rgba(42,143,138,.3);color:#1d6b67;border-radius:12px;padding:10px 14px;font-size:.84rem;margin-bottom:22px}
 .auth-bar.show{display:flex}
+.auth-bar a{color:var(--terra);font-weight:700;margin-right:10px}
 .auth-bar button{background:none;border:0;color:var(--terra);font-weight:700;cursor:pointer;text-decoration:underline}
 .btn[disabled]{opacity:.6;cursor:wait;transform:none}
 @media(max-width:680px){.auth-tab{font-size:.84rem;white-space:nowrap;padding:12px 6px}.auth-box{padding:34px 20px 24px}.auth-box h3{font-size:1.6rem}}
+
+
+/* ===== booking: animated ambient background (warm glow + gold slats, matches the lobby) ===== */
+.booking{position:relative;overflow:hidden}
+.booking>.container{position:relative;z-index:1}
+.booking::before,.booking::after{content:"";position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;will-change:transform;z-index:0}
+.booking::before{width:520px;height:520px;left:-160px;top:-120px;background:radial-gradient(circle,rgba(198,106,58,.5),transparent 68%);animation:bkDrift1 24s ease-in-out infinite alternate}
+.booking::after{width:480px;height:480px;right:-140px;bottom:-140px;background:radial-gradient(circle,rgba(42,143,138,.38),transparent 68%);animation:bkDrift2 28s ease-in-out infinite alternate}
+.booking .section-head{position:relative}
+.booking-slats{display:none}
+@keyframes bkDrift1{to{transform:translate3d(240px,160px,0) scale(1.2)}}
+@keyframes bkDrift2{to{transform:translate3d(-260px,-140px,0) scale(1.15)}}
+.f-row.one{grid-template-columns:1fr}
+.hint-inline{font-size:.62rem;color:var(--text-light-3);letter-spacing:0;text-transform:none;font-weight:500;margin-left:4px}
+@media(prefers-reduced-motion:reduce){.booking::before,.booking::after{animation:none}}
+
+@media(max-width:680px){
+  .booking{padding:64px 0}
+  .book-wrap{border-radius:20px}
+  .book-side{min-height:230px}
+  .book-side .overlay{padding:22px}
+  .book-side .panel-chip,.book-side p{display:none}
+  .book-side h3{font-size:1.35rem;margin-bottom:0}
+  .book-side ul{margin-top:12px;padding:12px;gap:8px}
+  .book-side li{font-size:.8rem}
+  .book-side li i{width:26px;height:26px;font-size:.75rem}
+  .book-form{padding:24px 18px 22px}
+  .book-form h3{font-size:1.45rem;margin-bottom:2px}
+  .book-form>p{font-size:.82rem;margin-bottom:16px}
+  .f-row,.f-row.one{gap:10px;margin-bottom:10px}
+  .f-row{grid-template-columns:1fr 1fr}
+  .f-row.one{grid-template-columns:1fr}
+  .f-row.r-guests{grid-template-columns:.62fr 1.38fr}
+  .f-group{gap:5px;min-width:0}
+  .f-group label{font-size:.6rem;letter-spacing:.12em}
+  .f-group input,.f-group select{padding:11px 12px;font-size:16px;border-radius:10px;min-height:46px}
+  .f-group select{padding-right:34px;background-position:right 12px center}
+  .f-group input[type=date],.f-group input[type=time]{-webkit-appearance:none;appearance:none;min-width:0;text-align:left}
+  .f-group .err{font-size:.66rem;line-height:1.25}
+  .form-note{margin:8px 0 14px;padding:9px 11px;font-size:.72rem}
+  .submit-btn{padding:15px}
+}

@@ -32,7 +32,6 @@
       <li><a href="#gallery">Gallery</a></li>
       <li><a href="#testimonials">Reviews</a></li>
       <li><a href="#contact">Contact</a></li>
-      <li><a href="admin.html" class="nav-admin">Admin</a></li>
       <li><a href="#" class="nav-admin" data-install hidden>Install App</a></li>
       <li class="nav-links-cta"><a href="#booking" class="btn btn-terra">Book Appointment</a></li>
     </ul>
@@ -238,9 +237,9 @@
       <form class="book-form" id="bookForm" novalidate>
         <h3 class="serif">Appointment Details</h3>
         <p>Fields marked * are required.</p>
-        <div class="auth-bar" id="authBar"><span id="authBarText"></span><button type="button" id="signOutBtn">Sign out</button></div>
-        <div class="f-row">
-          <div class="f-group">
+        <div class="auth-bar" id="authBar"><span id="authBarText"></span><span><a href="admin.html" id="adminLink" hidden>Dashboard</a> <button type="button" id="signOutBtn">Sign out</button></span></div>
+        <div class="f-row one">
+          <div class="f-group full">
             <label for="service">Service Type *</label>
             <select id="service" required>
               <option value="">Select a service…</option>
@@ -253,51 +252,53 @@
             </select>
             <span class="err">Please choose a service.</span>
           </div>
-          <div class="f-group">
-            <label for="guests">Guests / Pax *</label>
-            <input type="number" id="guests" min="1" max="50" value="2" required>
-            <span class="err">Enter 1–50 guests.</span>
-          </div>
         </div>
         <div class="f-row">
           <div class="f-group">
-            <label for="date">Preferred Date *</label>
+            <label for="date">Date *</label>
             <input type="date" id="date" required>
-            <span class="err">Please pick a date (today or later).</span>
+            <span class="err">Pick a date (today or later).</span>
           </div>
           <div class="f-group">
-            <label for="time">Preferred Time *</label>
+            <label for="time">Time *</label>
             <input type="time" id="time" min="07:00" max="20:00" step="1800" required>
-            <span class="err">Please choose a time between 7:00 AM and 8:00 PM.</span>
+            <span class="err">Choose 7:00 AM – 8:00 PM.</span>
           </div>
         </div>
-        <div class="f-row">
+        <div class="f-row r-guests">
           <div class="f-group">
-            <label for="name">Full Name *</label>
-            <input type="text" id="name" placeholder="Juan Dela Cruz" required>
-            <span class="err">Please enter your name.</span>
+            <label for="guests">Guests *</label>
+            <input type="number" id="guests" min="1" max="50" value="2" inputmode="numeric" required>
+            <span class="err">1–50 guests.</span>
           </div>
           <div class="f-group">
             <label for="phone">Mobile Number *</label>
-            <input type="tel" id="phone" placeholder="+63 9XX XXX XXXX" required>
+            <input type="tel" id="phone" placeholder="+63 9XX XXX XXXX" autocomplete="tel" required>
             <span class="err">Enter a valid phone number.</span>
           </div>
         </div>
-        <div class="f-row">
+        <div class="f-row one">
+          <div class="f-group full">
+            <label for="name">Full Name *</label>
+            <input type="text" id="name" placeholder="Juan Dela Cruz" autocomplete="name" required>
+            <span class="err">Please enter your name.</span>
+          </div>
+        </div>
+        <div class="f-row one">
           <div class="f-group full">
             <label for="email">Email *</label>
             <input type="email" id="email" placeholder="you@email.com" autocomplete="email" required>
             <span class="err">Enter a valid email address.</span>
           </div>
         </div>
-        <div class="f-row">
+        <div class="f-row r-extra">
           <div class="f-group">
-            <label for="coupon">Coupon Code <span style="font-size:.65rem;color:var(--text-light-3);letter-spacing:0;text-transform:none">— BAI10 for 10% off</span></label>
-            <input type="text" id="coupon" placeholder="Enter code">
+            <label for="coupon">Coupon Code</label>
+            <input type="text" id="coupon" placeholder="BAI10 = 10% off">
           </div>
           <div class="f-group">
             <label for="notes">Special Requests</label>
-            <input type="text" id="notes" placeholder="Occasions, allergies, preferences…">
+            <input type="text" id="notes" placeholder="Allergies, occasion">
           </div>
         </div>
         <p class="form-note">

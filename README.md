@@ -62,7 +62,7 @@ Setup:
 
 ## Admin page
 
-`admin.html` (the "Admin" link in the site menu). Features: live list of bookings (updates by itself), charts (per day, by service, status, busiest times), stats, search / filters / sorting, status per booking (Pending, Confirmed, Completed, Cancelled), details with internal note, delete, add a phone / walk-in booking, change password, CSV export and print.
+`admin.html`. There is no Admin button on the website: the admin signs in with the normal "Log in" form on `index.html` (email + password of `admin@gmail.com`) and is sent to the dashboard automatically. When already signed in, a "Dashboard" link shows in the signed-in bar (visible to the admin only). Anyone else who opens `admin.html` is sent back to the website; sign out returns to the website too. Features: live list of bookings (updates by itself), charts (per day, by service, status, busiest times), stats, search / filters / sorting, status per booking (Pending, Confirmed, Completed, Cancelled), details with internal note, delete, add a phone / walk-in booking, change password, CSV export and print.
 
 1. Firebase console > Authentication > Users > **Add user**: `admin@gmail.com` + password. Do this first, before anyone can sign up with that email on the site.
 2. Firestore > Rules > paste the latest `firestore.rules` > Publish (only `admin@gmail.com` can read all, edit or delete; guests can only create and read their own).

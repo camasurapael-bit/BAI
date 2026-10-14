@@ -20,21 +20,7 @@
 <meta name="apple-mobile-web-app-title" content="bai Hotel">
 </head>
 <body>
-
-<!-- LOGIN -->
-<main class="login" id="loginView">
-  <form class="card" id="loginForm" novalidate>
-    <a href="index.html" class="back">← Back to website</a>
-    <div class="brand"><span class="mark">b</span><div>bai Hotel<small>Admin</small></div></div>
-    <h1>Admin sign in</h1>
-    <label for="aEmail">Email</label>
-    <input type="email" id="aEmail" autocomplete="username" placeholder="admin@gmail.com" required>
-    <label for="aPass">Password</label>
-    <input type="password" id="aPass" autocomplete="current-password" required>
-    <p class="msg" id="loginMsg" role="alert"></p>
-    <button class="btn" id="loginBtn" type="submit">Sign in</button>
-  </form>
-</main>
+<div class="bg-fx" aria-hidden="true"><i></i><i></i><i></i></div>
 
 <!-- DASHBOARD -->
 <div class="dash" id="dashView" hidden>
@@ -105,10 +91,10 @@
         <option value="">All dates</option><option value="upcoming">Upcoming</option>
         <option value="today">Today</option><option value="past">Past</option>
       </select>
-      <select id="fSort" aria-label="Sort">
-        <option value="apptAsc">Appointment: soonest first</option>
-        <option value="apptDesc">Appointment: latest first</option>
-        <option value="newest">Newest booked first</option>
+      <select id="fSort" aria-label="Sort by">
+        <option value="apptAsc">Soonest first</option>
+        <option value="apptDesc">Latest first</option>
+        <option value="newest">Newest booked</option>
       </select>
       <button class="btn ghost" id="csvBtn" type="button">Export CSV</button>
       <button class="btn ghost" id="printBtn" type="button">Print</button>

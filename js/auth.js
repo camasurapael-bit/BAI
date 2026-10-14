@@ -16,6 +16,8 @@ const firebaseConfig = {
 
 const $ = id => document.getElementById(id);
 const modal = $('authModal'), msg = $('authMsg'), form = $('authForm');
+const ADMIN_EMAIL = 'admin@gmail.com';
+const isAdminUser = u => !!u && (u.email||'').toLowerCase() === ADMIN_EMAIL;
 let mode = 'signup', user = null, fb = null, afterAuth = null;
 const configured = !firebaseConfig.apiKey.startsWith('YOUR_');
 let readyResolve; const ready = new Promise(r=>readyResolve=r);
@@ -47,6 +49,7 @@ $('tabSignup').onclick = () => setMode('signup');
 function openAuth(cb){ afterAuth = cb || null; setMode('signup'); modal.classList.add('open'); setTimeout(()=>$('authEmail').focus(),250); }
 function closeAuth(){ modal.classList.remove('open'); clearMsg(); afterAuth = null; }
 function goBooking(){
+  if (isAdminUser(user)){ location.href = 'admin.html'; return; }   // admin signs in here -> dashboard
   const cb = afterAuth;
   closeAuth();
   if (cb){ cb(); return; }   // came from "Confirm appointment" -> finish the booking
@@ -115,7 +118,7 @@ async function loadFirebase(){
 }
 function renderUser(){
   const bar=$('authBar');
-  if (user){ $('authBarText').textContent = 'Signed in as ' + (user.displayName || user.email); bar.classList.add('show'); }
+  if (user){ $('authBarText').textContent = 'Signed in as ' + (user.displayName || user.email); bar.classList.add('show'); $('adminLink').hidden = !isAdminUser(user); }
   else bar.classList.remove('show');
 }
 if (configured) loadFirebase().catch(()=>{});   // restore session on page load
@@ -140,6 +143,7 @@ form.addEventListener('submit', async ev=>{
   email.closest('.f-group').classList.toggle('invalid',!ok1);
   pass.closest('.f-group').classList.toggle('invalid',!ok2);
   if(!(ok0&&ok1&&ok2)) return;
+  if (mode==='signup' && email.value.trim().toLowerCase()===ADMIN_EMAIL){ show('This email is reserved. Please use another email.'); return; }
   busy(true);
   try{
     const {A,auth} = await loadFirebase();

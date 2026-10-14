@@ -170,3 +170,68 @@ tbody tr.cancelled td{opacity:.55}
 .mi.out{color:#ff8a7a;margin-top:.2rem;border-top:1px solid var(--line);border-radius:0 0 9px 9px;padding-top:.8rem}
 .mi.out b{color:#ff8a7a}
 @media print{.menu-wrap{display:none!important}}
+
+
+/* ===== ambient background (echoes the lobby's gold slats + warm glow) ===== */
+.bg-fx{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.bg-fx i{position:absolute;border-radius:50%;filter:blur(80px);opacity:.34;will-change:transform}
+.bg-fx i:nth-child(1){width:46vmax;height:46vmax;left:-14vmax;top:-12vmax;background:radial-gradient(circle,var(--terra),transparent 68%);animation:drift1 26s ease-in-out infinite alternate}
+.bg-fx i:nth-child(2){width:40vmax;height:40vmax;right:-14vmax;top:22vh;background:radial-gradient(circle,#2a8f8a,transparent 68%);opacity:.22;animation:drift2 32s ease-in-out infinite alternate}
+.bg-fx i:nth-child(3){width:36vmax;height:36vmax;left:18vw;bottom:-18vmax;background:radial-gradient(circle,var(--gold),transparent 68%);opacity:.2;animation:drift3 30s ease-in-out infinite alternate}
+.bg-fx::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(212,175,90,.05) 0 1px,transparent 1px 38px);-webkit-mask-image:linear-gradient(180deg,#000 0,transparent 70%);mask-image:linear-gradient(180deg,#000 0,transparent 70%);animation:slats 40s linear infinite}
+@keyframes drift1{to{transform:translate3d(18vw,14vh,0) scale(1.15)}}
+@keyframes drift2{to{transform:translate3d(-20vw,-12vh,0) scale(.9)}}
+@keyframes drift3{to{transform:translate3d(16vw,-10vh,0) scale(1.2)}}
+@keyframes slats{to{background-position:38px 0}}
+@media(prefers-reduced-motion:reduce){.bg-fx i,.bg-fx::after{animation:none}}
+.dash{position:relative;z-index:1}
+.stat,.chart,.table-wrap{background:rgba(14,24,48,.74);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+
+/* ===== balanced stat boxes (no empty hole) ===== */
+@media(max-width:900px){
+  .stats{grid-template-columns:repeat(6,1fr)}
+  .stat{grid-column:span 2}
+  .stat:nth-child(n+4){grid-column:span 3}
+}
+@media(max-width:560px){
+  .stats{grid-template-columns:repeat(2,1fr);gap:.6rem}
+  .stat,.stat:nth-child(n+4){grid-column:span 1;padding:.8rem .9rem}
+  .stat:last-child{grid-column:1/-1}
+  .stat b{font-size:1.6rem}
+  .stat span{font-size:.66rem}
+}
+
+/* ===== filters: tidy grid on small screens ===== */
+@media(max-width:720px){
+  .filters{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+  .filters input,.filters select{width:100%;flex:none;min-width:0}
+  .filters input{grid-column:1/-1}
+  .filters .btn{display:block;width:100%;text-align:center;padding:.65rem .5rem}
+  .plot text{font-size:10px}
+}
+
+/* ===== appointments: cards on phones/tablets, no sideways scroll ===== */
+@media(max-width:900px){
+  .table-wrap{background:none;border:0;overflow:visible;-webkit-backdrop-filter:none;backdrop-filter:none}
+  table,tbody{display:block;min-width:0;width:100%}
+  thead{display:none}
+  tbody{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:.7rem}
+  tbody tr{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"ref st" "appt appt" "svc guests" "name name" "contact contact" "view view";gap:.55rem .8rem;background:rgba(14,24,48,.82);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;min-width:0}
+  tbody tr:hover td{background:none}
+  td{display:block;border:0;padding:0;min-width:0;overflow-wrap:anywhere}
+  td:nth-child(1){grid-area:ref;align-self:center}
+  td:nth-child(2){grid-area:appt;padding:.55rem .7rem;background:rgba(255,255,255,.04);border-radius:10px}
+  td:nth-child(3){grid-area:svc}
+  td:nth-child(4){grid-area:guests}
+  td:nth-child(5){grid-area:name}
+  td:nth-child(6){grid-area:contact}
+  td:nth-child(7){grid-area:st;justify-self:end}
+  td:nth-child(8){grid-area:view}
+  td:nth-child(3)::before,td:nth-child(4)::before,td:nth-child(5)::before,td:nth-child(6)::before{display:block;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2);font-weight:700;margin-bottom:.15rem}
+  td:nth-child(3)::before{content:"Service"}
+  td:nth-child(4)::before{content:"Guests"}
+  td:nth-child(5)::before{content:"Guest"}
+  td:nth-child(6)::before{content:"Contact"}
+  .view{width:100%;padding:.55rem}
+  .empty{background:rgba(14,24,48,.74);border:1px solid var(--line);border-radius:14px}
+}
