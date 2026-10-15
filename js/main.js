@@ -27,6 +27,7 @@ document.querySelectorAll('.gallery-actions .pill').forEach(p=>p.addEventListene
 
 const form=document.getElementById('bookForm'),modal=document.getElementById('modal');
 let lastReceipt=null;
+document.getElementById('addCal').addEventListener('click',function(){if(lastReceipt)window.baiICS({ref:lastReceipt.ref,service:lastReceipt.service,apptDate:lastReceipt.apptDate,apptTime:lastReceipt.apptTime,guests:lastReceipt.guests,name:lastReceipt.name})});
 /* Save the receipt (with QR) as a PNG image */
 document.getElementById('saveReceipt').addEventListener('click',function(){
   if(!lastReceipt)return;
@@ -63,6 +64,13 @@ form.addEventListener('submit',async e=>{
   ok=setV(em,/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value))&&ok;
   if(!ok)return;
   if(window.baiAuth&&!window.baiAuth.isSignedIn()){window.baiAuth.require(()=>form.requestSubmit());return}
+  const btn0=form.querySelector('.submit-btn'),btn0Txt=btn0.textContent;
+  btn0.disabled=true;btn0.textContent='Checking availability…';
+  const cfg=await window.baiAuth.getSettings();
+  if(Array.isArray(cfg.blockedDates)&&cfg.blockedDates.indexOf(dI.value)>-1){btn0.disabled=false;btn0.textContent=btn0Txt;alert('Sorry, we are not taking bookings on that date. Please choose another date.');return}
+  const slot=await window.baiAuth.checkSlot({service:svc.value,date:dI.value,time:tS.value});
+  btn0.disabled=false;btn0.textContent=btn0Txt;
+  if(slot&&slot.ok===false){alert(slot.reason==='closed'?'Sorry, we are not taking bookings on that date. Please choose another date.':'That time is fully booked. Please choose another time.');return}
   const ref='BAI-'+Math.random().toString(36).slice(2,8).toUpperCase();
   const u=window.baiAuth.getUser(), btn=form.querySelector('.submit-btn'), btnTxt=btn.textContent;
   btn.disabled=true;btn.textContent='Saving…';

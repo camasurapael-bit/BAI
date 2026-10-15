@@ -31,6 +31,9 @@
       <div class="menu" id="menu" hidden>
         <div class="who" id="who"></div>
         <button class="mi" id="newBtn" type="button"><b>+</b> New appointment</button>
+        <button class="mi" id="scanBtn" type="button"><b>▣</b> Scan QR (check-in)</button>
+        <button class="mi" id="availBtn" type="button"><b>⏲</b> Availability</button>
+        <button class="mi" id="logBtn" type="button"><b>☰</b> Activity log</button>
         <button class="mi" id="printBtn2" type="button"><b>⎙</b> Print list</button>
         <a class="mi" href="index.html"><b>↗</b> Website</a>
         <button class="mi" type="button" data-install hidden><b>⤓</b> Install app</button>
@@ -76,6 +79,17 @@
         <figcaption><div><h3>Busiest times</h3><p>Count by appointment start hour, cancelled excluded</p></div></figcaption>
         <div class="plot" id="p4" role="img" aria-label="Column chart of bookings by hour of day"></div>
       </figure>
+    </div>
+
+    <h2 class="sec">Calendar</h2>
+    <div class="cal" id="cal">
+      <div class="cal-head">
+        <button class="view" id="calPrev" type="button" aria-label="Previous month">‹</button>
+        <b id="calTitle"></b>
+        <button class="view" id="calNext" type="button" aria-label="Next month">›</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+      <p class="cal-hint">Tap a day to list its appointments. The number shows bookings (cancelled excluded).</p>
     </div>
 
     <h2 class="sec">Appointments</h2>
@@ -130,6 +144,7 @@
     <label for="dNote">Internal note (guests never see this)</label>
     <textarea id="dNote" rows="3" maxlength="500" placeholder="e.g. Called guest, confirmed by phone."></textarea>
     <p class="msg" id="dMsg" role="alert"></p>
+    <button class="btn ghost" id="dCheckin" type="button">Check in guest</button>
     <div class="modal-actions">
       <button class="btn danger" id="dDelete" type="button">Delete</button>
       <span class="grow"></span>
@@ -181,6 +196,49 @@
       <button class="btn ghost" type="button" data-close>Cancel</button>
       <button class="btn" id="pSave" type="submit">Update password</button></div>
   </form>
+</div>
+
+<!-- SCAN QR -->
+<div class="overlay" id="scanModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="scTitle">
+    <button class="x" type="button" data-close aria-label="Close">×</button>
+    <h2 id="scTitle">Scan QR (check-in)</h2>
+    <div class="scan-frame" id="scFrame"><video id="scVideo" playsinline muted></video><i></i></div>
+    <p class="hint" id="scHint">Point the camera at the guest's QR code.</p>
+    <div class="scan-manual">
+      <input type="text" id="scRef" placeholder="or type the reference, e.g. BAI-9AS2IX" autocapitalize="characters" autocomplete="off">
+      <button class="btn ghost" id="scFind" type="button">Find</button>
+    </div>
+    <div class="scan-result" id="scResult" hidden></div>
+  </div>
+</div>
+
+<!-- AVAILABILITY -->
+<div class="overlay" id="availModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="avTitle">
+    <button class="x" type="button" data-close aria-label="Close">×</button>
+    <h2 id="avTitle">Availability</h2>
+    <p class="hint">Block dates when the hotel cannot take bookings, and limit how many bookings one service can have in the same time slot.</p>
+    <label for="avDate">Block a date</label>
+    <div class="scan-manual"><input type="date" id="avDate"><button class="btn ghost" id="avAdd" type="button">Block</button></div>
+    <div class="chips" id="avList"></div>
+    <label for="avCap">Max bookings per service per time slot (0 = no limit)</label>
+    <input type="number" id="avCap" min="0" max="500" value="0">
+    <p class="msg" id="avMsg" role="alert"></p>
+    <div class="modal-actions"><span class="grow"></span>
+      <button class="btn ghost" type="button" data-close>Close</button>
+      <button class="btn" id="avSave" type="button">Save</button></div>
+  </div>
+</div>
+
+<!-- ACTIVITY LOG -->
+<div class="overlay" id="logModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="lgTitle">
+    <button class="x" type="button" data-close aria-label="Close">×</button>
+    <h2 id="lgTitle">Activity log</h2>
+    <p class="hint">The last 50 actions made in the dashboard.</p>
+    <ul class="log" id="logList"></ul>
+  </div>
 </div>
 
 <div class="tip" id="tip" hidden></div>

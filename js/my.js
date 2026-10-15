@@ -3,7 +3,7 @@
    and the new time must be at least CUTOFF_HOURS from now. A rescheduled booking returns to "pending". */
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import {getAuth, onAuthStateChanged, signOut} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import {getFirestore, collection, query, where, onSnapshot, doc, updateDoc, serverTimestamp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import {getFirestore, collection, query, where, onSnapshot, doc, getDoc, updateDoc, serverTimestamp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyA-Po8Edgg5uTlq4MUosj94OBcSjUB_Das",
@@ -43,6 +43,14 @@ function resched(a){
   return {ok:true};
 }
 
+function canCancel(a){
+  const s = stOf(a);
+  if (s !== 'pending' && s !== 'confirmed') return false;
+  const ms = startOf(a) - Date.now();
+  return ms >= CUTOFF_HOURS*3600e3;
+}
+const stars = n => '★'.repeat(n) + '☆'.repeat(5-n);
+
 function render(){
   const up = all.filter(isUpcoming).sort((a,b) => startOf(a)-startOf(b));
   const past = all.filter(a => !isUpcoming(a)).sort((a,b) => startOf(b)-startOf(a));
@@ -54,17 +62,23 @@ function render(){
   list.forEach(a => {
     const s = stOf(a), r = resched(a), c = el('article', 'card' + (tab==='past' ? ' past' : ''));
     c.style.setProperty('--st', COLOR[s] || '#c66a3a');
-    const r1 = el('div','row1'); r1.append(el('span','ref',a.refCode||''), el('span','pill '+s, LABEL[s]||s)); 
+    const r1 = el('div','row1'); r1.append(el('span','ref',a.refCode||''), el('span','pill '+s, LABEL[s]||s));
     const w = el('div','when'); w.append(el('b',null,fmtDate(a.apptDate)), el('span',null,fmtTime(a.apptTime)));
     const m = el('div','meta'); const g = el('span'); g.append('Guests ', el('b',null,String(a.guests||'')));
     m.append(g); if (a.rescheduleCount){ const rr = el('span'); rr.append('Rescheduled ', el('b',null,a.rescheduleCount+'x')); m.append(rr); }
     c.append(r1, el('h3','svc',a.service||''), w, m);
     if (a.notes) c.append(el('p','note','“'+a.notes+'”'));
+    const btn = (label, cls, fn, off) => { const b = el('button','btn small '+cls,label); b.type='button'; b.disabled=!!off; b.onclick=fn; return b; };
     const acts = el('div','acts');
-    const q = el('button','btn ghost small','QR code'); q.type = 'button'; q.onclick = () => openQR(a);
-    const rb = el('button','btn small','Reschedule'); rb.type = 'button'; rb.disabled = !r.ok; rb.onclick = () => openResched(a);
-    acts.append(q, rb); if (!r.ok && tab==='up') acts.append(el('p','lock',r.why)); 
-    if (!r.ok && tab==='past' && s!=='completed' && s!=='cancelled') acts.append(el('p','lock',r.why));
+    acts.append(btn('QR code','ghost',() => openQR(a)));
+    if (s==='pending' || s==='confirmed') acts.append(btn('Add to calendar','ghost',() => window.baiICS({ref:a.refCode, service:a.service, apptDate:a.apptDate, apptTime:a.apptTime, guests:a.guests})));
+    acts.append(btn('Reschedule','',() => openResched(a), !r.ok));
+    if (isUpcoming(a) || s==='pending' || s==='confirmed') acts.append(btn('Cancel booking','danger',() => cancelBooking(a), !canCancel(a)));
+    if (s==='completed'){
+      if (a.rating) { const rt = el('p','rated'); rt.append(el('span','stars',stars(a.rating)), ' Thanks for your feedback!'); acts.append(rt); }
+      else acts.append(btn('★ Rate your visit','',() => openRate(a)));
+    }
+    if (!r.ok && (s==='pending' || s==='confirmed')) acts.append(el('p','lock',r.why));
     c.append(acts); box.append(c);
   });
 }
@@ -86,9 +100,9 @@ function openResched(a){
   $('rsDate').min = todayStr(); $('rsDate').value = a.apptDate; $('rsTime').value = a.apptTime || '';
   $('rsModal').hidden = false; $('rsDate').focus();
 }
-document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => { $('rsModal').hidden = true; $('qrModal').hidden = true; }));
-['rsModal','qrModal'].forEach(id => $(id).addEventListener('click', e => { if (e.target.id === id) $(id).hidden = true; }));
-document.addEventListener('keydown', e => { if (e.key === 'Escape'){ $('rsModal').hidden = true; $('qrModal').hidden = true; } });
+document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => { $('rsModal').hidden = true; $('qrModal').hidden = true; $('rtModal').hidden = true; }));
+['rsModal','qrModal','rtModal'].forEach(id => $(id).addEventListener('click', e => { if (e.target.id === id) $(id).hidden = true; }));
+document.addEventListener('keydown', e => { if (e.key === 'Escape'){ $('rsModal').hidden = true; $('qrModal').hidden = true; $('rtModal').hidden = true; } });
 
 $('rsForm').addEventListener('submit', async ev => {
   ev.preventDefault(); const msg = t => $('rsMsg').textContent = t; msg('');
@@ -101,6 +115,14 @@ $('rsForm').addEventListener('submit', async ev => {
   if (new Date(d+'T'+t+':00') - Date.now() < CUTOFF_HOURS*3600e3) return msg('The new time must be at least '+CUTOFF_HOURS+' hours from now.');
   $('rsSave').disabled = true;
   try {
+    const cfg = await getDoc(doc(db,'settings','availability')).then(x => x.exists() ? x.data() : {}).catch(() => ({}));
+    if (Array.isArray(cfg.blockedDates) && cfg.blockedDates.includes(d)){ msg('We are not taking bookings on that date. Please pick another date.'); $('rsSave').disabled = false; return; }
+    try {
+      const token = await auth.currentUser.getIdToken();
+      const sr = await fetch('/api/slot', {method:'POST', headers:{'Content-Type':'application/json', Authorization:'Bearer '+token}, body:JSON.stringify({service:a.service, date:d, time:t, exceptId:a.id})});
+      const sj = sr.ok ? await sr.json() : {ok:true};
+      if (sj.ok === false){ msg(sj.reason === 'closed' ? 'We are not taking bookings on that date.' : 'That time is fully booked. Please choose another time.'); $('rsSave').disabled = false; return; }
+    } catch(e){}
     await updateDoc(doc(db,'appointments',a.id), {apptDate:d, apptTime:t, status:'pending', rescheduledAt:serverTimestamp(), rescheduleCount:(a.rescheduleCount||0)+1});
     $('rsModal').hidden = true; toast('Rescheduled. Waiting for the hotel to confirm the new time.');
     sendEmail({type:'rescheduled', ref:a.refCode, name:a.fullName, service:a.service, guests:a.guests, apptDate:d, apptTime:t});
@@ -114,6 +136,32 @@ async function sendEmail(payload){
   try { const token = await auth.currentUser.getIdToken();
     await fetch('/api/notify', {method:'POST', headers:{'Content-Type':'application/json', Authorization:'Bearer '+token}, body:JSON.stringify(payload)}); } catch(e){}
 }
+
+/* ----- cancel (guest) ----- */
+async function cancelBooking(a){
+  if (!canCancel(a)) return toast('Cancelling closes '+CUTOFF_HOURS+' hours before the appointment. Please call the hotel.');
+  if (!confirm('Cancel your appointment '+a.refCode+' ('+a.service+', '+fmtDate(a.apptDate)+' '+fmtTime(a.apptTime)+')?')) return;
+  try {
+    await updateDoc(doc(db,'appointments',a.id), {status:'cancelled', cancelledAt:serverTimestamp()});
+    toast('Your appointment was cancelled.');
+    sendEmail({type:'guestcancel', ref:a.refCode, name:a.fullName, service:a.service, guests:a.guests, apptDate:a.apptDate, apptTime:a.apptTime});
+  } catch(e){ console.error(e); toast(e && e.code==='permission-denied' ? 'This booking can no longer be cancelled online. Please call the hotel.' : 'Could not cancel. Check your connection.'); }
+}
+
+/* ----- rate a completed visit ----- */
+let rateId = null, rateVal = 0;
+function paintStars(){ document.querySelectorAll('#starRow button').forEach(b => b.classList.toggle('on', +b.dataset.v <= rateVal)); }
+function openRate(a){ rateId = a.id; rateVal = 0; paintStars(); $('rtText').value = ''; $('rtMsg').textContent = ''; $('rtSub').textContent = a.service + ' · ' + fmtDate(a.apptDate); $('rtModal').hidden = false; }
+$('starRow').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; rateVal = +b.dataset.v; paintStars(); });
+$('rtForm').addEventListener('submit', async ev => {
+  ev.preventDefault(); if (!rateVal) { $('rtMsg').textContent = 'Tap a star to rate.'; return; }
+  $('rtSave').disabled = true;
+  try {
+    await updateDoc(doc(db,'appointments',rateId), {rating:rateVal, review:$('rtText').value.trim().slice(0,500), ratedAt:serverTimestamp()});
+    $('rtModal').hidden = true; toast('Thank you for your feedback!');
+  } catch(e){ console.error(e); $('rtMsg').textContent = 'Could not save your rating. Please try again.'; }
+  $('rtSave').disabled = false;
+});
 
 /* ----- session ----- */
 $('outBtn').onclick = async () => { try { await signOut(auth); } finally { location.replace('index.html'); } };

@@ -77,6 +77,21 @@ window.baiAuth = {
     const {F,db} = await loadFirebase();
     await F.addDoc(F.collection(db,'appointments'), {...data, uid:user.uid, createdAt:F.serverTimestamp()});
   },
+  /* admin-managed availability (public document settings/availability): {blockedDates:[], capacity} */
+  getSettings: async () => {
+    try { const {F,db} = await loadFirebase(); const s = await F.getDoc(F.doc(db,'settings','availability')); return s.exists() ? s.data() : {}; }
+    catch(e){ return {}; }
+  },
+  /* server-side capacity check; fails open (never blocks booking because the helper is unavailable) */
+  checkSlot: async p => {
+    try {
+      if (!user) return {ok:true};
+      const token = await user.getIdToken();
+      const r = await fetch('/api/slot', {method:'POST', headers:{'Content-Type':'application/json', Authorization:'Bearer '+token}, body:JSON.stringify(p)});
+      if (!r.ok) return {ok:true};
+      return await r.json();
+    } catch(e){ return {ok:true}; }
+  },
   /* email the signed-in guest their receipt (server: /api/notify) */
   notify: async payload => {
     if (!user) return;

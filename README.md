@@ -56,6 +56,26 @@ Then open http://localhost:8080/
 - `firestore.rules` also requires a verified email to create a booking, so republish the rules after updating.
 - Optional: Firebase console > Authentication > Templates > Email address verification lets you customise the email text and sender name.
 
+## New features (all free-tier)
+
+**Guests (My Appointment page):** Add to calendar (.ics), Cancel booking (up to 2 h before), Rate a completed visit (1-5 stars + comment), plus reschedule. The booking receipt also has an Add to calendar button.
+
+**Admin dashboard (menu):**
+- **Scan QR (check-in):** camera scanner (Chrome/Android; other browsers use the "type the reference" box). Shows the booking and a **Check in guest** button (also in the detail window).
+- **Availability:** block dates and set the max bookings per service per time slot (0 = no limit). Blocked dates are enforced on the booking form and when rescheduling.
+- **Calendar view:** month grid with booking counts; tap a day to list its appointments.
+- **Activity log:** last 50 dashboard actions (status changes, deletes, check-ins, availability), saved in Firestore `auditLog` (admin only).
+
+**Emails (Brevo, via `/api`):** guest receipt, confirmed / declined / completed (with a "Rate your visit" link), reschedule, guest cancellation; alert emails to the hotel for new, rescheduled and guest-cancelled bookings.
+
+**Daily job (`api/cron.js`, Vercel Cron 00:00 UTC = 8:00 AM Philippines):** reminder email to guests with a CONFIRMED appointment tomorrow, plus a daily summary email to the hotel.
+
+### Extra setup for the daily job and the slot-capacity check (optional, free)
+1. Firebase console > Project settings > **Service accounts** > Generate new private key (downloads a JSON).
+2. Vercel > Environment Variables: `FIREBASE_SERVICE_ACCOUNT` = the whole JSON (one value); optional `ADMIN_ALERT_EMAIL` (where hotel alerts go, default = SENDER_EMAIL); optional `CRON_SECRET` (any long random text).
+3. Keep `package.json` and `vercel.json` in the repo root, then redeploy. Without steps 1-2 everything still works except reminders and the capacity limit (blocked dates still work).
+4. **Republish `firestore.rules`** (new rules for cancel, rating, settings and auditLog).
+
 ## My Appointment page (guests)
 
 - The site menu has a **My Appointment** button (it replaced "Install App"; hidden for the admin). A logged-out visitor is asked to log in first, then lands on `my-appointments.html`.

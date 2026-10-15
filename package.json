@@ -1,0 +1,9 @@
+{
+  "name": "bai-hotel-appointment",
+  "private": true,
+  "version": "1.0.0",
+  "description": "bai Hotel Cebu appointment website (static) with small serverless helpers in /api",
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}

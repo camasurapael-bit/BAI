@@ -47,7 +47,7 @@
         <button type="button" role="tab" data-t="up" class="on">Upcoming <b id="cUp">0</b></button>
         <button type="button" role="tab" data-t="past">Past &amp; closed <b id="cPast">0</b></button>
       </div>
-      <p class="rule" id="rule">You can reschedule up to <b>2 hours</b> before your appointment, up to <b>2 times</b>. A rescheduled booking goes back to <b>Pending</b> until the hotel confirms the new time.</p>
+      <p class="rule" id="rule">You can reschedule or cancel up to <b>2 hours</b> before your appointment (rescheduling: up to <b>2 times</b>). A rescheduled booking goes back to <b>Pending</b> until the hotel confirms the new time.</p>
       <div class="cards" id="list"></div>
       <p class="empty" id="empty" hidden></p>
     </section>
@@ -83,9 +83,28 @@
   </div>
 </div>
 
+<!-- RATE -->
+<div class="overlay" id="rtModal" hidden>
+  <form class="modal" id="rtForm" novalidate role="dialog" aria-modal="true" aria-labelledby="rtTitle">
+    <button class="x" type="button" data-close aria-label="Close">×</button>
+    <h2 id="rtTitle">Rate your visit</h2>
+    <p class="hint" id="rtSub"></p>
+    <div class="star-row" id="starRow" role="group" aria-label="Rating">
+      <button type="button" data-v="1" aria-label="1 star">★</button><button type="button" data-v="2" aria-label="2 stars">★</button><button type="button" data-v="3" aria-label="3 stars">★</button><button type="button" data-v="4" aria-label="4 stars">★</button><button type="button" data-v="5" aria-label="5 stars">★</button>
+    </div>
+    <label for="rtText">Comment (optional)</label>
+    <textarea id="rtText" rows="3" maxlength="500" placeholder="Tell us how it went…"></textarea>
+    <p class="msg" id="rtMsg" role="alert"></p>
+    <div class="modal-actions"><span class="grow"></span>
+      <button class="btn ghost" type="button" data-close>Cancel</button>
+      <button class="btn" id="rtSave" type="submit">Send rating</button></div>
+  </form>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script src="js/qr.js"></script>
+<script src="js/ics.js"></script>
 <script type="module" src="js/my.js"></script>
 <script src="js/pwa.js"></script>
 </body>

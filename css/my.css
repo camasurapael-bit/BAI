@@ -105,3 +105,19 @@ input:focus{outline:2px solid var(--terra);outline-offset:1px}
   .grid2{grid-template-columns:1fr}
   .btn.ghost{padding:.55rem .85rem}
 }
+
+
+/* cancel / rate */
+.btn.danger{background:transparent;border-color:rgba(255,138,122,.55);color:var(--err)}
+.btn.danger:hover{background:rgba(255,138,122,.12);filter:none}
+.btn.danger:disabled{opacity:.4}
+.acts .btn{min-width:0;white-space:normal;text-align:center;line-height:1.2}
+.rated{grid-column:1/-1;text-align:center;color:var(--text-2);font-size:.8rem}
+.stars{color:var(--gold);letter-spacing:.1em;font-size:1rem}
+.star-row{display:flex;justify-content:center;gap:.3rem;margin:.6rem 0}
+.star-row button{background:none;border:0;font-size:2.2rem;line-height:1;color:rgba(255,255,255,.22);cursor:pointer;padding:.1rem .2rem;transition:transform .15s,color .15s}
+.star-row button.on{color:var(--gold)}
+.star-row button:active{transform:scale(1.15)}
+textarea{width:100%;background:var(--navy-deep);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:.7rem .8rem;font:500 16px 'Manrope',sans-serif;resize:vertical;min-height:84px;color-scheme:dark}
+textarea:focus{outline:2px solid var(--terra);outline-offset:1px}
+.modal>*{flex-shrink:0}

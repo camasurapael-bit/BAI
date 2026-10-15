@@ -501,3 +501,5 @@ footer h4::before{content:"";width:18px;height:1px;background:var(--terra-soft)}
   .rc-rows dt,.rc-rows dd{padding:7px 0}
   .modal-box .receipt-actions{margin-top:10px}
 }
+
+.modal-box .receipt-actions .wide{grid-column:1/-1}

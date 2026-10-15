@@ -3,7 +3,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, updatePassword }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp }
+import { getFirestore, collection, query, orderBy, limit, onSnapshot, getDocs, getDoc, setDoc, addDoc, updateDoc, deleteDoc, doc, serverTimestamp }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const ADMIN_EMAIL = 'admin@gmail.com';
@@ -25,6 +25,7 @@ const app = initializeApp({
 const auth = getAuth(app), db = getFirestore(app);
 const $ = id => document.getElementById(id);
 let all = [], unsub = null, firstSnap = true, range = 'past', openId = null;
+let calMonth = new Date(), calDay = '', blocked = [];
 let scanRef = new URLSearchParams(location.search).get('ref');   // opened from a receipt QR code
 
 /* ---------- helpers ---------- */
@@ -63,8 +64,13 @@ onAuthStateChanged(auth, u => {
   if (!isAdmin){ stopLive(); all = []; location.replace('index.html'); return; }
   $('dashView').hidden = false;
   $('who').textContent = u.email;
-  startLive();
+  startLive(); loadBlocked();
 });
+
+/* ---------- activity log (admin only collection "auditLog") ---------- */
+function audit(action, a, detail){
+  addDoc(collection(db,'auditLog'), {at:serverTimestamp(), by:(auth.currentUser&&auth.currentUser.email)||'', action, ref:(a&&a.refCode)||'', guest:(a&&a.fullName)||'', detail:detail||''}).catch(() => {});
+}
 
 /* ---------- email the guest (via /api/notify, Brevo) ---------- */
 async function notifyGuest(a, status, message){
@@ -79,6 +85,7 @@ async function notifyGuest(a, status, message){
 const MAILABLE = {confirmed:1, cancelled:1, completed:1};
 async function saveStatus(a, status, message){
   await updateDoc(doc(db,'appointments',a.id), {status, updatedAt:serverTimestamp()});
+  audit('Status → '+STATUSES[status].label, a);
   if (!MAILABLE[status]) return toast('Status: '+STATUSES[status].label);
   try { const r = await notifyGuest(a, status, message); toast('Status: '+STATUSES[status].label+(r==='sent' ? ' · email sent to guest' : ' · no email on file')); }
   catch(e){ toast('Saved, but email not sent: '+e.message); }
@@ -126,6 +133,7 @@ function filtered(){
     if (w==='upcoming' && !(a.apptDate >= t)) return false;
     if (w==='today' && a.apptDate !== t) return false;
     if (w==='past' && !(a.apptDate < t)) return false;
+    if (calDay && a.apptDate !== calDay) return false;
     if (q && ![a.refCode,a.fullName,a.phone,a.email,a.service,a.notes,a.adminNote].some(x => String(x||'').toLowerCase().includes(q))) return false;
     return true;
   });
@@ -137,13 +145,13 @@ function filtered(){
 
 function renderList(){
   const t = todayStr(), rows = filtered();
-  $('count').textContent = rows.length + (rows.length===1?' appointment':' appointments') + (rows.length!==all.length ? ' (of '+all.length+')' : '');
+  $('count').textContent = rows.length + (rows.length===1?' appointment':' appointments') + (rows.length!==all.length ? ' (of '+all.length+')' : '') + (calDay ? ' · '+fmtDate(calDay)+' (tap the day again to clear)' : '');
   $('empty').hidden = rows.length > 0;
   $('rows').innerHTML = rows.map(a => {
     const when = a.apptDate === t ? ['today','Today'] : a.apptDate < t ? ['past','Past'] : ['','Upcoming'];
     const s = stOf(a);
     return `<tr data-id="${esc(a.id)}" class="${s==='cancelled'?'cancelled':''}">
-      <td class="ref">${esc(a.refCode)}</td>
+      <td class="ref">${esc(a.refCode)}${a.checkedInAt?'<span class="sub ok">✓ Checked in</span>':''}${a.rating?`<span class="sub gold">${'★'.repeat(a.rating)}</span>`:''}</td>
       <td><b>${esc(fmtDate(a.apptDate))}</b><span class="sub">${esc(fmtTime(a.apptTime))} · <span class="pill ${when[0]}">${when[1]}</span></span></td>
       <td>${esc(a.service)}${a.coupon?`<span class="sub">Coupon: ${esc(a.coupon)}</span>`:''}</td>
       <td>${esc(a.guests)}</td>
@@ -165,7 +173,7 @@ function renderStats(){
   $('stGuests').textContent = up.reduce((n,a)=>n+(+a.guests||0),0);
 }
 
-function renderAll(){ renderStats(); renderList(); drawCharts(); }
+function renderAll(){ renderStats(); renderList(); drawCharts(); renderCal(); }
 ['q','fService','fStatus','fWhen','fSort'].forEach(id => $(id).addEventListener('input', renderList));
 
 /* inline status + open details */
@@ -190,10 +198,14 @@ function fillDetail(a, keepEdits){
     ['Guests', a.guests], ['Guest name', a.fullName], ['Mobile', a.phone], ['Email', a.email],
     ['Account email', a.accountEmail], ['Coupon', a.coupon], ['Guest request', a.notes],
     ['Booked', bookedAt(a) + (a.source==='admin' ? ' (by admin)' : '')],
+    ['Checked in', a.checkedInAt && a.checkedInAt.toDate ? a.checkedInAt.toDate().toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'}) : ''],
+    ['Rating', a.rating ? '★'.repeat(a.rating)+'☆'.repeat(5-a.rating) : ''], ['Guest review', a.review],
+    ['Cancelled by guest', a.cancelledAt ? 'Yes' : ''],
     ['Rescheduled', a.rescheduleCount ? 'By guest ' + a.rescheduleCount + 'x (needs re-confirm if pending)' : '']
   ].filter(r => r[1] !== undefined && r[1] !== null && r[1] !== '');
   const dl = $('dBody'); dl.textContent = '';
   rows.forEach(([k,v]) => { const dt=document.createElement('dt'); dt.textContent=k; const dd=document.createElement('dd'); dd.textContent=v; dl.append(dt,dd); });
+  $('dCheckin').textContent = a.checkedInAt ? 'Checked in ✓' : 'Check in guest'; $('dCheckin').disabled = !!a.checkedInAt;
   if (!keepEdits){ $('dStatus').value = stOf(a); $('dNote').value = a.adminNote || ''; $('dGuestMsg').value = ''; setMsg('dMsg',''); }
 }
 $('dSave').onclick = async () => {
@@ -202,6 +214,7 @@ $('dSave').onclick = async () => {
     const a = all.find(x => x.id === openId), ns = $('dStatus').value, changed = a && stOf(a) !== ns, gm = $('dGuestMsg').value.trim().slice(0,500);
     if (changed && ns === 'cancelled' && !confirm('Decline / cancel this appointment and email the guest?')){ $('dSave').disabled = false; return; }
     await updateDoc(doc(db,'appointments',openId), {status:ns, adminNote:$('dNote').value.trim().slice(0,500), updatedAt:serverTimestamp()});
+    if (changed) audit('Status → '+STATUSES[ns].label, a, gm ? 'Message to guest: '+gm : ''); else audit('Note edited', a);
     if (changed && MAILABLE[ns]){
       try { const r = await notifyGuest(a, ns, gm); toast('Saved'+(r==='sent' ? ' · email sent to guest' : ' · no email on file')); }
       catch(e){ toast('Saved, but email not sent: '+e.message); }
@@ -213,7 +226,7 @@ $('dSave').onclick = async () => {
 $('dDelete').onclick = async () => {
   const a = all.find(x=>x.id===openId); if (!a) return;
   if (!confirm('Delete appointment '+a.refCode+' for '+a.fullName+'? This cannot be undone.\n\nTip: use "Cancelled" status to keep a record.')) return;
-  try { await deleteDoc(doc(db,'appointments',openId)); toast('Deleted'); closeModals(); }
+  try { await deleteDoc(doc(db,'appointments',openId)); audit('Deleted', a); toast('Deleted'); closeModals(); }
   catch(e){ setMsg('dMsg', friendly(e)); }
 };
 
@@ -240,12 +253,113 @@ $('newForm').addEventListener('submit', async ev => {
       coupon:null, notes:v('nNotes')||null, status:'confirmed', source:'admin', createdAt:serverTimestamp()
     };
     await addDoc(collection(db,'appointments'), rec);
+    audit('Added by admin', rec);
     closeModals();
     if (email){ try { await notifyGuest(rec, 'confirmed', ''); toast('Appointment added · confirmation emailed'); } catch(e){ toast('Added, but email not sent: '+e.message); } }
     else toast('Appointment added');
   } catch(e){ setMsg('nMsg', friendly(e)); }
   $('nSave').disabled = false;
 });
+
+
+/* ---------- calendar view ---------- */
+function renderCal(){
+  const y = calMonth.getFullYear(), m = calMonth.getMonth(), first = new Date(y, m, 1), days = new Date(y, m+1, 0).getDate(), t = todayStr();
+  $('calTitle').textContent = first.toLocaleDateString('en-PH',{month:'long', year:'numeric'});
+  const counts = {}; all.filter(live).forEach(a => { counts[a.apptDate] = (counts[a.apptDate]||0) + 1; });
+  const g = $('calGrid'); g.textContent = '';
+  ['S','M','T','W','T','F','S'].forEach(d => g.append(Object.assign(document.createElement('span'), {className:'cal-dow', textContent:d})));
+  for (let i = 0; i < first.getDay(); i++) g.append(document.createElement('span'));
+  for (let d = 1; d <= days; d++){
+    const ds = y+'-'+pad(m+1)+'-'+pad(d), n = counts[ds] || 0, b = document.createElement('button');
+    b.type = 'button'; b.className = 'cal-day' + (ds===t ? ' today' : '') + (ds===calDay ? ' sel' : '') + (blocked.includes(ds) ? ' blocked' : '') + (n ? ' has' : '');
+    b.dataset.d = ds; b.setAttribute('aria-label', fmtDate(ds)+(n ? ', '+n+' bookings' : ''));
+    b.append(Object.assign(document.createElement('i'), {textContent:d}));
+    if (n) b.append(Object.assign(document.createElement('b'), {textContent:n}));
+    g.append(b);
+  }
+}
+$('calGrid').addEventListener('click', e => { const b = e.target.closest('.cal-day'); if (!b) return; calDay = (calDay === b.dataset.d) ? '' : b.dataset.d; renderCal(); renderList(); if (calDay) $('rows').scrollIntoView({behavior:'smooth', block:'start'}); });
+$('calPrev').onclick = () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()-1, 1); renderCal(); };
+$('calNext').onclick = () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()+1, 1); renderCal(); };
+
+/* ---------- check-in ---------- */
+async function checkIn(a){
+  if (!a || a.checkedInAt) return;
+  await updateDoc(doc(db,'appointments',a.id), {checkedInAt:serverTimestamp()});
+  audit('Checked in', a); toast('Checked in: '+(a.fullName||a.refCode));
+}
+$('dCheckin').onclick = async () => { const a = all.find(x=>x.id===openId); if (!a) return; try { await checkIn(a); } catch(e){ setMsg('dMsg', friendly(e)); } };
+
+/* ---------- QR scanner ---------- */
+let scanStream = null, scanTimer = null;
+function stopScan(){ clearInterval(scanTimer); scanTimer = null; if (scanStream){ scanStream.getTracks().forEach(t => t.stop()); scanStream = null; } const v = $('scVideo'); if (v) v.srcObject = null; }
+function refFromText(t){ const m = /ref=([A-Za-z0-9-]+)/.exec(t) || /(BAI-[A-Za-z0-9]{4,8})/i.exec(t); return m ? m[1].toUpperCase() : ''; }
+function showScanResult(ref){
+  const a = all.find(x => (x.refCode||'').toUpperCase() === ref), box = $('scResult'); box.hidden = false; box.textContent = '';
+  if (!a){ box.append(Object.assign(document.createElement('p'), {className:'msg', textContent:'No appointment found for '+ref+'.'})); return; }
+  const h = document.createElement('div'); h.className = 'sr-head';
+  h.append(Object.assign(document.createElement('b'), {textContent:a.fullName||''}), Object.assign(document.createElement('span'), {className:'pill', textContent:STATUSES[stOf(a)].label}));
+  const p = Object.assign(document.createElement('p'), {className:'hint', textContent:a.refCode+' · '+a.service+' · '+fmtDate(a.apptDate)+' '+fmtTime(a.apptTime)+' · '+a.guests+' guest(s)'});
+  const row = document.createElement('div'); row.className = 'modal-actions';
+  const ci = Object.assign(document.createElement('button'), {className:'btn', type:'button', textContent:a.checkedInAt ? 'Already checked in ✓' : 'Check in guest', disabled:!!a.checkedInAt});
+  ci.onclick = async () => { try { await checkIn(a); ci.textContent = 'Checked in ✓'; ci.disabled = true; } catch(e){ toast(friendly(e)); } };
+  const od = Object.assign(document.createElement('button'), {className:'btn ghost', type:'button', textContent:'Open details'});
+  od.onclick = () => { stopScan(); closeModals(); openDetail(a.id); };
+  row.append(ci, od); box.append(h, p, row);
+}
+async function startScan(){
+  $('scResult').hidden = true; $('scRef').value = '';
+  if (!('BarcodeDetector' in window) || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    $('scFrame').hidden = true; $('scHint').textContent = 'Camera scanning is not supported in this browser. Type the reference code below instead.'; return;
+  }
+  $('scFrame').hidden = false; $('scHint').textContent = "Point the camera at the guest's QR code.";
+  try {
+    const det = new BarcodeDetector({formats:['qr_code']});
+    scanStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}, audio:false});
+    const v = $('scVideo'); v.srcObject = scanStream; await v.play();
+    scanTimer = setInterval(async () => {
+      try { const f = await det.detect(v); if (f.length){ const ref = refFromText(f[0].rawValue||''); if (ref){ stopScan(); $('scHint').textContent = 'Scanned '+ref; showScanResult(ref); } } } catch(e){}
+    }, 350);
+  } catch(e){ $('scFrame').hidden = true; $('scHint').textContent = 'Could not open the camera ('+(e && e.name || 'error')+'). Allow camera access, or type the reference below.'; }
+}
+$('scanBtn').onclick = () => { $('menu').hidden = true; $('burger').setAttribute('aria-expanded','false'); $('scanModal').hidden = false; startScan(); };
+$('scFind').onclick = () => { const r = refFromText($('scRef').value.trim()) || $('scRef').value.trim().toUpperCase(); if (r) showScanResult(r); };
+$('scRef').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); $('scFind').click(); } });
+
+/* ---------- availability (settings/availability: blockedDates + capacity) ---------- */
+async function loadBlocked(){ try { const s = await getDoc(doc(db,'settings','availability')); const d = s.exists() ? s.data() : {}; blocked = Array.isArray(d.blockedDates) ? d.blockedDates.slice().sort() : []; $('avCap').value = parseInt(d.capacity,10) || 0; } catch(e){} renderCal(); }
+function renderBlocked(){
+  const box = $('avList'); box.textContent = '';
+  if (!blocked.length){ box.append(Object.assign(document.createElement('span'), {className:'hint', textContent:'No blocked dates.'})); return; }
+  blocked.forEach(d => { const c = document.createElement('span'); c.className = 'chip'; c.append(fmtDate(d)+' ');
+    const x = Object.assign(document.createElement('button'), {type:'button', textContent:'×', title:'Remove'}); x.onclick = () => { blocked = blocked.filter(v => v !== d); renderBlocked(); }; c.append(x); box.append(c); });
+}
+$('availBtn').onclick = async () => { $('menu').hidden = true; $('burger').setAttribute('aria-expanded','false'); setMsg('avMsg',''); $('avDate').min = todayStr(); $('avDate').value = ''; $('availModal').hidden = false; await loadBlocked(); renderBlocked(); };
+$('avAdd').onclick = () => { const v = $('avDate').value; if (!v) return; if (!blocked.includes(v)) blocked.push(v); blocked.sort(); $('avDate').value = ''; renderBlocked(); };
+$('avSave').onclick = async () => {
+  $('avSave').disabled = true; setMsg('avMsg','');
+  try {
+    const cap = Math.max(0, Math.min(500, parseInt($('avCap').value,10) || 0));
+    await setDoc(doc(db,'settings','availability'), {blockedDates:blocked, capacity:cap, updatedAt:serverTimestamp()});
+    audit('Availability updated', null, blocked.length+' blocked date(s), capacity '+cap); renderCal(); toast('Availability saved'); closeModals();
+  } catch(e){ setMsg('avMsg', friendly(e)); }
+  $('avSave').disabled = false;
+};
+
+/* ---------- activity log ---------- */
+$('logBtn').onclick = async () => {
+  $('menu').hidden = true; $('burger').setAttribute('aria-expanded','false'); $('logModal').hidden = false;
+  const ul = $('logList'); ul.textContent = ''; ul.append(Object.assign(document.createElement('li'), {className:'hint', textContent:'Loading…'}));
+  try {
+    const snap = await getDocs(query(collection(db,'auditLog'), orderBy('at','desc'), limit(50))); ul.textContent = '';
+    if (snap.empty) ul.append(Object.assign(document.createElement('li'), {className:'hint', textContent:'No activity yet.'}));
+    snap.docs.forEach(d => { const x = d.data(), li = document.createElement('li');
+      const when = x.at && x.at.toDate ? x.at.toDate().toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'}) : '';
+      li.append(Object.assign(document.createElement('b'), {textContent:x.action||''}), Object.assign(document.createElement('span'), {textContent:[x.ref, x.guest].filter(Boolean).join(' · ')}),
+        Object.assign(document.createElement('small'), {textContent:when+' · '+(x.by||'')+(x.detail ? ' · '+x.detail : '')})); ul.append(li); });
+  } catch(e){ ul.textContent = ''; ul.append(Object.assign(document.createElement('li'), {className:'msg', textContent:friendly(e)})); }
+};
 
 /* ---------- password ---------- */
 $('pwBtn').onclick = () => { $('pwForm').reset(); setMsg('pMsg',''); $('pwModal').hidden = false; $('pNew').focus(); };
@@ -261,7 +375,7 @@ $('pwForm').addEventListener('submit', async ev => {
 });
 
 /* ---------- modal plumbing ---------- */
-function closeModals(){ document.querySelectorAll('.overlay').forEach(o => o.hidden = true); openId = null; }
+function closeModals(){ stopScan(); document.querySelectorAll('.overlay').forEach(o => o.hidden = true); openId = null; }
 document.addEventListener('click', e => {
   if (e.target.closest('[data-close]') || (e.target.classList && e.target.classList.contains('overlay'))) closeModals();
 });
