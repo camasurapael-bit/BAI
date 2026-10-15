@@ -27,7 +27,7 @@ document.querySelectorAll('.gallery-actions .pill').forEach(p=>p.addEventListene
 
 const form=document.getElementById('bookForm'),modal=document.getElementById('modal');
 let lastReceipt=null;
-document.getElementById('addCal').addEventListener('click',function(){if(lastReceipt)window.baiICS({ref:lastReceipt.ref,service:lastReceipt.service,apptDate:lastReceipt.apptDate,apptTime:lastReceipt.apptTime,guests:lastReceipt.guests,name:lastReceipt.name})});
+document.getElementById('addCal').addEventListener('click',function(){if(lastReceipt)window.baiCal({ref:lastReceipt.ref,service:lastReceipt.service,apptDate:lastReceipt.apptDate,apptTime:lastReceipt.apptTime,guests:lastReceipt.guests,name:lastReceipt.name})});
 /* Save the receipt (with QR) as a PNG image */
 document.getElementById('saveReceipt').addEventListener('click',function(){
   if(!lastReceipt)return;

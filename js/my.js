@@ -71,7 +71,7 @@ function render(){
     const btn = (label, cls, fn, off) => { const b = el('button','btn small '+cls,label); b.type='button'; b.disabled=!!off; b.onclick=fn; return b; };
     const acts = el('div','acts');
     acts.append(btn('QR code','ghost',() => openQR(a)));
-    if (s==='pending' || s==='confirmed') acts.append(btn('Add to calendar','ghost',() => window.baiICS({ref:a.refCode, service:a.service, apptDate:a.apptDate, apptTime:a.apptTime, guests:a.guests})));
+    if (s==='pending' || s==='confirmed') acts.append(btn('Add to calendar','ghost',() => window.baiCal({ref:a.refCode, service:a.service, apptDate:a.apptDate, apptTime:a.apptTime, guests:a.guests})));
     acts.append(btn('Reschedule','',() => openResched(a), !r.ok));
     if (isUpcoming(a) || s==='pending' || s==='confirmed') acts.append(btn('Cancel booking','danger',() => cancelBooking(a), !canCancel(a)));
     if (s==='completed'){
