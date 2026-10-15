@@ -22,8 +22,27 @@ service cloud.firestore {
       allow read: if request.auth != null
         && (resource.data.uid == request.auth.uid || isAdmin());
 
-      // Only the admin can change status / notes or delete.
-      allow update, delete: if isAdmin();
+      // The admin can change anything and delete.
+      allow delete: if isAdmin();
+
+      // A verified guest can reschedule their OWN booking (max 2 times) while it is
+      // pending or confirmed. Only date, time and bookkeeping fields may change, and the
+      // booking goes back to "pending" so the hotel re-confirms it.
+      allow update: if isAdmin() || (
+        request.auth != null
+        && request.auth.token.email_verified == true
+        && resource.data.uid == request.auth.uid
+        && resource.data.get('status', 'pending') in ['pending', 'confirmed']
+        && resource.data.get('rescheduleCount', 0) < 2
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['apptDate', 'apptTime', 'status', 'rescheduledAt', 'rescheduleCount'])
+        && request.resource.data.status == 'pending'
+        && request.resource.data.apptDate is string && request.resource.data.apptDate.size() == 10
+        && request.resource.data.apptTime is string
+        && request.resource.data.apptTime >= '07:00' && request.resource.data.apptTime <= '20:00'
+        && request.resource.data.rescheduleCount == resource.data.get('rescheduleCount', 0) + 1
+        && request.resource.data.rescheduledAt == request.time
+      );
     }
   }
 }

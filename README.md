@@ -56,6 +56,15 @@ Then open http://localhost:8080/
 - `firestore.rules` also requires a verified email to create a booking, so republish the rules after updating.
 - Optional: Firebase console > Authentication > Templates > Email address verification lets you customise the email text and sender name.
 
+## My Appointment page (guests)
+
+- The site menu has a **My Appointment** button (it replaced "Install App"; hidden for the admin). A logged-out visitor is asked to log in first, then lands on `my-appointments.html`.
+- The page lists the guest's own bookings live (Upcoming / Past & closed), shows each booking's QR code, and lets the guest **reschedule**:
+  - only Pending or Confirmed bookings, at least **2 hours** before the appointment, up to **2 times**;
+  - the new time must be 7:00 AM - 8:00 PM and at least 2 hours from now;
+  - a rescheduled booking goes back to **Pending** so the admin re-confirms it; the guest gets an email and the admin sees a notice.
+- These limits are constants at the top of `js/my.js` (`CUTOFF_HOURS`, `MAX_RESCHEDULES`). `firestore.rules` also restricts what a guest may change (date, time, status back to pending) - **republish the rules** after updating.
+
 ## Receipt QR code and emails
 
 - After **Confirm Appointment** the receipt shows a QR code (it opens `admin.html?ref=BAI-XXXXXX`, so the admin scans it and lands on that booking). **Save receipt** downloads the receipt as a PNG. `js/qr.js` generates the QR in the browser (no internet needed).

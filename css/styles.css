@@ -481,3 +481,23 @@ footer h4::before{content:"";width:18px;height:1px;background:var(--terra-soft)}
 .btn-outline-dark{background:transparent;border:1.5px solid var(--terra);color:var(--terra);font-weight:700;cursor:pointer;border-radius:999px}
 .btn-outline-dark:hover{background:rgba(198,106,58,.1)}
 @media(max-width:680px){.modal-box{padding:28px 20px}.qr-box svg{width:150px;height:150px}}
+
+
+/* ===== receipt: same layout as the confirmation email (details list, QR centered) ===== */
+.modal-box .rc-lead{margin-bottom:12px}
+.rc-rows{display:grid;grid-template-columns:96px 1fr;gap:0;margin:0 0 14px;text-align:left;border-top:1px solid var(--line-light);border-bottom:1px solid var(--line-light)}
+.rc-rows dt,.rc-rows dd{margin:0;padding:9px 0;border-top:1px solid rgba(0,0,0,.05)}
+.rc-rows dt:first-of-type,.rc-rows dd:first-of-type{border-top:0}
+.rc-rows dt{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-light-3,#7a8194);align-self:center}
+.rc-rows dd{font-weight:700;font-size:.92rem;color:var(--text-light);overflow-wrap:anywhere}
+.rc-rows dd:first-of-type{font-family:'JetBrains Mono',monospace;color:var(--terra);letter-spacing:.06em}
+.modal-box .qr-box{display:block;width:fit-content;margin:0 auto 8px;padding:8px;line-height:0}
+.modal-box .qr-box svg{width:176px;height:176px;display:block;margin:0}
+.modal-box .qr-cap{text-align:center;margin-bottom:10px}
+@media(max-width:680px){.rc-rows{grid-template-columns:84px 1fr}.modal-box .qr-box svg{width:160px;height:160px}.modal-box h3{font-size:1.45rem}}
+@media(max-width:680px){
+  .modal-box .check-ring{width:56px;height:56px;font-size:1.5rem;margin:0 auto 10px}
+  .modal-box{padding:22px 18px}
+  .rc-rows dt,.rc-rows dd{padding:7px 0}
+  .modal-box .receipt-actions{margin-top:10px}
+}

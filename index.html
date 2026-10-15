@@ -33,7 +33,7 @@
       <li><a href="#testimonials">Reviews</a></li>
       <li><a href="#contact">Contact</a></li>
       <li id="navDashboard" hidden><a href="admin.html">Dashboard</a></li>
-      <li><a href="#" class="nav-admin" data-install hidden>Install App</a></li>
+      <li id="navMyLi"><a href="my-appointments.html" id="navMy">My Appointment</a></li>
       <li class="nav-links-cta"><a href="#booking" class="btn btn-terra">Book Appointment</a></li>
     </ul>
     <a href="#booking" class="btn btn-terra nav-cta">Book Appointment</a>
@@ -402,8 +402,8 @@
   <div class="modal-box">
     <div class="check-ring">✓</div>
     <h3 class="serif">Appointment Requested!</h3>
-    <p id="modalSummary">Your request has been sent to our concierge.</p>
-    <div class="ref-code" id="refCode">BAI-000000</div>
+    <p class="rc-lead">Your request was sent to our concierge.</p>
+    <dl class="rc-rows" id="rcRows"></dl>
     <div class="qr-box" id="qrBox" aria-label="Receipt QR code"></div>
     <p class="qr-cap">Show this QR code at the front desk.</p>
     <p style="font-size:.78rem">We'll email you when your appointment is confirmed or declined.</p>

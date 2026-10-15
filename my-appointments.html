@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>My Appointments — bai Hotel Cebu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/my.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#c66a3a">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="bai Hotel">
+</head>
+<body>
+<div class="bg-fx" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<div class="page">
+  <header class="top">
+    <a class="brand" href="index.html"><span class="mark">b</span><div>bai Hotel<small>Cebu · Mandaue</small></div></a>
+    <div class="top-actions">
+      <a class="btn ghost" href="index.html#booking">Book new</a>
+      <button class="btn ghost" id="outBtn" type="button" hidden>Sign out</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <p class="eyebrow"><span class="dot"></span>My account</p>
+    <h1>My <em>appointments</em></h1>
+    <p class="sub" id="who">Loading your bookings…</p>
+
+    <section class="gate" id="gate" hidden>
+      <h2>Log in to see your appointments</h2>
+      <p>Your bookings, QR codes and reschedule options are tied to your account.</p>
+      <a class="btn" href="index.html?login=my">Log in</a>
+    </section>
+
+    <section id="board" hidden>
+      <div class="seg" id="tabs" role="tablist" aria-label="Appointments">
+        <button type="button" role="tab" data-t="up" class="on">Upcoming <b id="cUp">0</b></button>
+        <button type="button" role="tab" data-t="past">Past &amp; closed <b id="cPast">0</b></button>
+      </div>
+      <p class="rule" id="rule">You can reschedule up to <b>2 hours</b> before your appointment, up to <b>2 times</b>. A rescheduled booking goes back to <b>Pending</b> until the hotel confirms the new time.</p>
+      <div class="cards" id="list"></div>
+      <p class="empty" id="empty" hidden></p>
+    </section>
+  </main>
+</div>
+
+<!-- RESCHEDULE -->
+<div class="overlay" id="rsModal" hidden>
+  <form class="modal" id="rsForm" novalidate role="dialog" aria-modal="true" aria-labelledby="rsTitle">
+    <button class="x" type="button" data-close aria-label="Close">×</button>
+    <h2 id="rsTitle">Reschedule</h2>
+    <p class="hint" id="rsCur"></p>
+    <div class="grid2">
+      <div><label for="rsDate">New date</label><input type="date" id="rsDate" required></div>
+      <div><label for="rsTime">New time</label><input type="time" id="rsTime" min="07:00" max="20:00" step="1800" required></div>
+    </div>
+    <p class="hint">Open 7:00 AM – 8:00 PM. The new time must be at least 2 hours from now.</p>
+    <p class="msg" id="rsMsg" role="alert"></p>
+    <div class="modal-actions"><span class="grow"></span>
+      <button class="btn ghost" type="button" data-close>Cancel</button>
+      <button class="btn" id="rsSave" type="submit">Confirm new time</button></div>
+  </form>
+</div>
+
+<!-- QR -->
+<div class="overlay" id="qrModal" hidden>
+  <div class="modal small center" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+    <button class="x" type="button" data-close aria-label="Close">×</button>
+    <h2 id="qrTitle">Your QR code</h2>
+    <div class="qr-box" id="qrBox"></div>
+    <div class="ref" id="qrRef"></div>
+    <p class="hint">Show this QR code at the front desk.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="js/qr.js"></script>
+<script type="module" src="js/my.js"></script>
+<script src="js/pwa.js"></script>
+</body>
+</html>

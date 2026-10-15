@@ -92,6 +92,8 @@ function startLive(){
     if (!firstSnap){
       const added = snap.docChanges().filter(c => c.type==='added' && !c.doc.metadata.hasPendingWrites);
       if (added.length) toast(added.length===1 ? 'New appointment: '+(added[0].doc.data().fullName||'') : added.length+' new appointments');
+      snap.docChanges().forEach(c => { if (c.type!=='modified' || c.doc.metadata.hasPendingWrites) return; const p = all.find(x=>x.id===c.doc.id), d = c.doc.data();
+        if (p && (p.apptDate!==d.apptDate || p.apptTime!==d.apptTime)) toast('Rescheduled: '+(d.fullName||'')+' → '+fmtDate(d.apptDate)+' '+fmtTime(d.apptTime)); });
     }
     firstSnap = false;
     all = snap.docs.map(d => ({id:d.id, ...d.data()}));
@@ -187,7 +189,8 @@ function fillDetail(a, keepEdits){
     ['Reference', a.refCode], ['Service', a.service], ['Date', fmtDate(a.apptDate)], ['Time', fmtTime(a.apptTime)],
     ['Guests', a.guests], ['Guest name', a.fullName], ['Mobile', a.phone], ['Email', a.email],
     ['Account email', a.accountEmail], ['Coupon', a.coupon], ['Guest request', a.notes],
-    ['Booked', bookedAt(a) + (a.source==='admin' ? ' (by admin)' : '')]
+    ['Booked', bookedAt(a) + (a.source==='admin' ? ' (by admin)' : '')],
+    ['Rescheduled', a.rescheduleCount ? 'By guest ' + a.rescheduleCount + 'x (needs re-confirm if pending)' : '']
   ].filter(r => r[1] !== undefined && r[1] !== null && r[1] !== '');
   const dl = $('dBody'); dl.textContent = '';
   rows.forEach(([k,v]) => { const dt=document.createElement('dt'); dt.textContent=k; const dd=document.createElement('dd'); dd.textContent=v; dl.append(dt,dd); });

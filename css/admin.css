@@ -235,3 +235,14 @@ tbody tr.cancelled td{opacity:.55}
   .view{width:100%;padding:.55rem}
   .empty{background:rgba(14,24,48,.74);border:1px solid var(--line);border-radius:14px}
 }
+
+/* ===== detail / form modals: textboxes must not get squashed ===== */
+.modal>*{flex-shrink:0}
+.modal textarea{min-height:84px;display:block}
+.modal select{display:block}
+@media(max-width:560px){
+  .modal{padding:1.3rem 1.1rem}
+  .kv{grid-template-columns:96px 1fr;gap:.45rem .7rem;font-size:.84rem}
+  .kv dt{font-size:.64rem;padding-top:.2rem}
+  .modal-actions .btn{padding:.6rem .9rem}
+}

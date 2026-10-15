@@ -1,6 +1,6 @@
 /* Vercel serverless function: sends appointment emails through Brevo.
    POST /api/notify   Authorization: Bearer <Firebase ID token>
-   - type "received": the signed-in guest gets their receipt (sent only to the verified email of that account).
+   - type "received" / "rescheduled": the signed-in guest gets their receipt (sent only to the verified email of that account).
    - type "status":   ONLY the admin can use it; emails the guest when a booking is confirmed / declined / completed.
    Environment variables (Vercel > Project > Settings > Environment Variables):
      BREVO_API_KEY   your Brevo API key (v3)
@@ -20,6 +20,8 @@ const fmtTime = t => { const m = /^(\d{1,2}):(\d{2})$/.exec(t || ''); if (!m) re
 const STATUS = {
   received:  {subject:'We received your appointment request', title:'Request received', color:'#c66a3a',
               lead:'Thank you! Your request is now with our concierge team. We will email you again as soon as it is confirmed or declined.'},
+  rescheduled: {subject:'We received your new schedule', title:'Reschedule received', color:'#c66a3a',
+              lead:'Your appointment has been moved to the new date and time below. It is pending again, and we will email you as soon as the hotel confirms it.'},
   confirmed: {subject:'Your appointment is confirmed', title:'Appointment confirmed', color:'#2e9e6b',
               lead:'Good news! Your appointment is confirmed. We look forward to welcoming you at bai Hotel Cebu.'},
   cancelled: {subject:'Update on your appointment request', title:'Appointment declined', color:'#c93a3a',
@@ -34,7 +36,7 @@ function buildHtml(kind, d, site, extraMsg) {
   const rows = [['Reference', d.ref], ['Service', d.service], ['Date', fmtDate(d.apptDate)], ['Time', fmtTime(d.apptTime)], ['Guests', d.guests]]
     .filter(r => r[1]).map(r => `<tr><td style="padding:8px 0;color:#7a8194;font-size:12px;letter-spacing:1px;text-transform:uppercase;width:110px">${esc(r[0])}</td><td style="padding:8px 0;color:#16244a;font-size:15px;font-weight:600">${esc(r[1])}</td></tr>`).join('');
   const note = extraMsg ? `<div style="margin:18px 0;padding:14px 16px;background:#fff7ef;border-left:4px solid #c66a3a;border-radius:6px;color:#16244a;font-size:14px;line-height:1.5"><b>Message from the hotel</b><br>${esc(extraMsg).replace(/\n/g, '<br>')}</div>` : '';
-  const showQr = kind === 'received' || kind === 'confirmed';
+  const showQr = kind === 'received' || kind === 'confirmed' || kind === 'rescheduled';
   return `<!doctype html><html><body style="margin:0;background:#f1ece3;font-family:Arial,Helvetica,sans-serif">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f1ece3;padding:24px 12px"><tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:16px;overflow:hidden">
@@ -76,13 +78,13 @@ module.exports = async (req, res) => {
   if (!d.ref) return res.status(400).json({error: 'Missing reference.'});
 
   let kind, to, extra = '';
-  if (b.type === 'received') {
+  if (b.type === 'received' || b.type === 'rescheduled') {
     if (!who.emailVerified && !isAdmin) return res.status(403).json({error: 'Email not verified.'});
-    kind = 'received'; to = email;                       // always the signed-in guest's own verified address
+    kind = b.type; to = email;                       // always the signed-in guest's own verified address
   } else if (b.type === 'status') {
     if (!isAdmin) return res.status(403).json({error: 'Admins only.'});
     kind = String(b.status);
-    if (!STATUS[kind] || kind === 'received') return res.status(400).json({error: 'This status is not emailed.'});
+    if (!STATUS[kind] || kind === 'received' || kind === 'rescheduled') return res.status(400).json({error: 'This status is not emailed.'});
     to = clip(b.to, 200).trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) return res.status(400).json({error: 'Guest email looks invalid.'});
     extra = clip(b.message, 500);

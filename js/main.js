@@ -81,13 +81,13 @@ form.addEventListener('submit',async e=>{
     btn.disabled=false;btn.textContent=btnTxt;return;
   }
   btn.disabled=false;btn.textContent=btnTxt;
-  document.getElementById('refCode').textContent=ref;
   const d=new Date(dI.value+'T'+tS.value+':00');
   lastReceipt={ref:ref,service:svc.value,guests:gx.value,apptDate:dI.value,apptTime:tS.value,name:nm.value.trim(),phone:ph.value.trim(),when:d.toLocaleDateString('en-PH',{weekday:'long',month:'long',day:'numeric',year:'numeric'})+' · '+fmtTime(tS.value)};
   var qrUrl=location.origin+'/admin.html?ref='+encodeURIComponent(ref);
   try{document.getElementById('qrBox').innerHTML=window.baiQR.svg(qrUrl,168)}catch(e){}
   window.baiAuth.notify({type:'received',ref:ref,name:nm.value.trim(),service:svc.value,guests:parseInt(gx.value,10),apptDate:dI.value,apptTime:tS.value}).catch(function(){});
-  document.getElementById('modalSummary').innerHTML='<b>'+svc.value+'</b> for <b>'+gx.value+' guest(s)</b><br>'+d.toLocaleDateString('en-PH',{weekday:'long',month:'long',day:'numeric',year:'numeric'})+' · '+fmtTime(tS.value)+'<br>Under the name <b>'+nm.value.trim()+'</b>';
+  var rc=document.getElementById('rcRows');rc.textContent='';
+  [['Reference',ref],['Service',svc.value],['Date',d.toLocaleDateString('en-PH',{weekday:'long',month:'long',day:'numeric',year:'numeric'})],['Time',fmtTime(tS.value)],['Guests',gx.value],['Name',nm.value.trim()]].forEach(function(p){var dt=document.createElement('dt');dt.textContent=p[0];var dd=document.createElement('dd');dd.textContent=p[1];rc.append(dt,dd)});
   modal.classList.add('open');form.reset();gx.value=2;
 });
 document.getElementById('modalClose').addEventListener('click',()=>modal.classList.remove('open'));

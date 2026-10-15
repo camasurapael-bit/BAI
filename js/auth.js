@@ -130,6 +130,7 @@ function renderUser(){
   if (user){ $('authBarText').textContent = 'Signed in as ' + (user.displayName || user.email); bar.classList.add('show'); $('adminLink').hidden = !isAdminUser(user); }
   else bar.classList.remove('show');
   const nd = $('navDashboard'); if (nd) nd.hidden = !isAdminUser(user);
+  const nm = $('navMyLi'); if (nm) nm.hidden = isAdminUser(user);
 }
 if (configured) loadFirebase().catch(()=>{});   // restore session on page load
 
@@ -189,3 +190,10 @@ $('forgotBtn').onclick = async ()=>{
 };
 
 $('signOutBtn').onclick = async ()=>{ try{ const {A,auth}=await loadFirebase(); await A.signOut(auth); user=null; renderUser(); }catch(e){} };
+
+
+/* "My Appointment" menu button: log in first if needed, then open the page */
+const navMy = $('navMy');
+if (navMy) navMy.addEventListener('click', ev => { ev.preventDefault(); window.baiAuth.require(() => { location.href = 'my-appointments.html'; }); });
+/* arriving from my-appointments.html while logged out */
+if (new URLSearchParams(location.search).get('login') === 'my') window.baiAuth.require(() => { location.href = 'my-appointments.html'; });
