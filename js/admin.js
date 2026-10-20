@@ -173,7 +173,7 @@ function renderStats(){
   $('stGuests').textContent = up.reduce((n,a)=>n+(+a.guests||0),0);
 }
 
-function renderAll(){ renderStats(); renderList(); drawCharts(); renderCal(); }
+function renderAll(){ renderStats(); renderList(); renderCal(); drawCharts(); }
 ['q','fService','fStatus','fWhen','fSort'].forEach(id => $(id).addEventListener('input', renderList));
 
 /* inline status + open details */
@@ -280,8 +280,8 @@ function renderCal(){
   }
 }
 $('calGrid').addEventListener('click', e => { const b = e.target.closest('.cal-day'); if (!b) return; calDay = (calDay === b.dataset.d) ? '' : b.dataset.d; renderCal(); renderList(); if (calDay) $('rows').scrollIntoView({behavior:'smooth', block:'start'}); });
-$('calPrev').onclick = () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()-1, 1); renderCal(); };
-$('calNext').onclick = () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()+1, 1); renderCal(); };
+$('calPrev').onclick = () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()-1, 1); renderCal(); drawCharts(); };
+$('calNext').onclick = () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()+1, 1); renderCal(); drawCharts(); };
 
 /* ---------- check-in ---------- */
 async function checkIn(a){
@@ -508,7 +508,9 @@ function drawCharts(){
   const hours = []; for (let h=7; h<=20; h++) hours.push(h);
   const hl = h => ((h%12)||12)+(h>=12?'PM':'AM');
   const narrow = $('p4').clientWidth < 560;
-  columnChart($('p4'), hours.map((h,i) => ({v:byHour[h]||0, tip:hl(h)+' – '+hl(h+1), tick:(narrow && i%2) ? '' : hl(h)})), {h:200});
+  const side = innerWidth > 900 && $('c5') && $('c5').offsetHeight > 0;          // calendar sits beside this chart on desktop
+  const h4 = side ? Math.max(200, Math.min(420, $('c5').offsetHeight - 120)) : 230;
+  columnChart($('p4'), hours.map((h,i) => ({v:byHour[h]||0, tip:hl(h)+' – '+hl(h+1), tick:(narrow && i%2) ? '' : hl(h)})), {h:h4});
 }
 
 $('rangeSeg').addEventListener('click', e => {

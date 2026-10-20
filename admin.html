@@ -75,21 +75,22 @@
         <figcaption><div><h3>Status</h3><p>All bookings</p></div></figcaption>
         <div class="plot" id="p3" role="img" aria-label="Breakdown of bookings by status"></div>
       </figure>
-      <figure class="chart wide" id="c4">
+      <figure class="chart" id="c4">
         <figcaption><div><h3>Busiest times</h3><p>Count by appointment start hour, cancelled excluded</p></div></figcaption>
         <div class="plot" id="p4" role="img" aria-label="Column chart of bookings by hour of day"></div>
       </figure>
-    </div>
-
-    <h2 class="sec">Calendar</h2>
-    <div class="cal" id="cal">
-      <div class="cal-head">
-        <button class="view" id="calPrev" type="button" aria-label="Previous month">‹</button>
-        <b id="calTitle"></b>
-        <button class="view" id="calNext" type="button" aria-label="Next month">›</button>
-      </div>
-      <div class="cal-grid" id="calGrid"></div>
-      <p class="cal-hint">Tap a day to list its appointments. The number shows bookings (cancelled excluded).</p>
+      <figure class="chart cal" id="c5">
+        <figcaption>
+          <div><h3>Calendar</h3><p>Tap a day to list its appointments</p></div>
+          <div class="cal-nav">
+            <button class="view" id="calPrev" type="button" aria-label="Previous month">‹</button>
+            <b id="calTitle"></b>
+            <button class="view" id="calNext" type="button" aria-label="Next month">›</button>
+          </div>
+        </figcaption>
+        <div class="cal-grid" id="calGrid"></div>
+        <p class="cal-hint">The number is the bookings that day (cancelled excluded). Striped days are blocked.</p>
+      </figure>
     </div>
 
     <h2 class="sec">Appointments</h2>

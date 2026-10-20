@@ -304,3 +304,15 @@ td .sub.gold{color:var(--gold);font-family:'Manrope',sans-serif;letter-spacing:.
   .menu .who{font-size:.74rem;margin-right:.2rem}
 }
 @media(min-width:901px) and (max-width:1499px){ .menu .who{display:none} }
+
+
+/* ===== calendar lives in the chart grid, beside "Busiest times" ===== */
+.chart.cal{max-width:none;padding:1rem 1.1rem 1.1rem}
+.cal-nav{display:flex;align-items:center;gap:.6rem}
+.cal-nav b{font-family:'Playfair Display',serif;font-size:1rem;font-weight:600;min-width:9.5em;text-align:center}
+.cal-nav .view{width:36px;height:34px;padding:0;font-size:1.15rem;line-height:1}
+.chart.cal .cal-grid{margin-top:.2rem}
+@media(min-width:901px){
+  .chart.cal .cal-day{aspect-ratio:auto;height:46px;min-height:0}
+}
+@media(max-width:900px){ .cal-nav{width:100%;justify-content:space-between} }
